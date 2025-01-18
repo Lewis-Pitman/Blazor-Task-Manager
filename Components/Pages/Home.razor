@@ -4,8 +4,12 @@
 
 <PageTitle>Home</PageTitle>
 
+<MudPopoverProvider />
+<MudDialogProvider />
+<MudSnackbarProvider />
+
 <div class="header">
-    <MudTabs Elevation="0" Color="@Color.Primary">
+    <MudTabs Elevation="0" MaxHeight="200">
         <MudTabPanel Text="One" />
         <MudTabPanel Text="Two" />
         <MudTabPanel Text="Three" />
@@ -22,26 +26,41 @@
 
 
     <div class="header-options">
-    <MudSwitch @bind-Value="toggle" Color="Color.Secondary" Style="margin: auto;"/>
+        <MudSwitch 
+        @bind-Value="darkMode"
+        Color="Color.Primary"
+        UncheckedColor="Color.Primary"
+        Style="margin: auto;"
+        ThumbIcon="@(darkMode ? Icons.Material.Filled.DarkMode : Icons.Material.Filled.LightMode)" 
+        ThumbIconColor="Color.Info"
+        Size="Size.Large"
+        />
 
-    <MudToggleGroup T="string" Outlined="@_outlined" Delimiters="@_delimiters" Size="@_size" Color="@_color" Rounded="@_rounded" CheckMark="@_checkMark" FixedContent="@_fixedContent" Disabled="@_disabled" Style="width: 30rem">
-                <MudToggleItem Value="@("One")" />
-                <MudToggleItem Value="@("Two")" />
-                <MudToggleItem Value="@("Three")" />
-    </MudToggleGroup>
+        <MudToggleGroup T="string" @bind-Value="screen" Outlined="@_outlined" Delimiters="@_delimiters" Size="@_size" Rounded="@_rounded" CheckMark="@_checkMark" FixedContent="@_fixedContent" Disabled="@_disabled" Style="width: auto;">
+            <MudToggleItem Value="@("Dashboard")">
+                <MudIcon Icon="@Icons.Material.Filled.Home" />
+            </MudToggleItem>
+
+            <MudToggleItem Value="@("Task list")">
+                <MudIcon Icon="@Icons.Material.Filled.FormatListBulleted" />
+            </MudToggleItem>
+
+            <MudToggleItem Value="@("Kanban")">
+                <MudIcon Icon="@Icons.Material.Filled.ViewKanban" />
+            </MudToggleItem>
+        </MudToggleGroup>
     </div>
 
 </div>
 
 <div>
-    <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
-    <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
-    <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
-    <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
+    <p>Main content goes here</p>
 </div>
 
-    @code{
-        public bool toggle;
+
+@code{
+    public bool darkMode = true;
+    public string screen = "Dashboard";
 
     Size _size = Size.Medium;
     Color _color = Color.Secondary;
@@ -51,4 +70,5 @@
     bool _delimiters = false;
     bool _fixedContent = false;
     bool _disabled = false;
-    }
+
+}

@@ -2,7 +2,7 @@
 
 <MudThemeProvider Theme="@_theme" IsDarkMode="_isDarkMode" />
 <MudLayout>
-    <MudMainContent Class="">
+    <MudMainContent Style="padding-top: 0px;">
         @Body
     </MudMainContent>
 </MudLayout>
@@ -52,11 +52,11 @@
         GrayLighter = "#f9f9f9",
     };
 
-    private readonly PaletteDark _darkPalette = new()
+    public readonly PaletteDark _darkPalette = new()
     {
-        Primary = "#7e6fff",
-        Surface = "#1e1e2d",
-        Background = "#1a1a27",
+        Primary = "#56a7f2",
+        Surface = "#000000",
+        Background = "#2d2d2d",
         BackgroundGray = "#151521",
         AppbarText = "#92929f",
         AppbarBackground = "rgba(26,26,39,0.8)",
@@ -71,14 +71,14 @@
         DrawerText = "#92929f",
         GrayLight = "#2a2833",
         GrayLighter = "#1e1e2d",
-        Info = "#4a86ff",
+        Info = "#FFFFFF",
         Success = "#3dcb6c",
-        Warning = "#ffb545",
-        Error = "#ff3f5f",
+        Warning = "#f25656",
+        Error = "#f25656",
         LinesDefault = "#33323e",
         TableLines = "#33323e",
         Divider = "#292838",
-        OverlayLight = "#1e1e2d80",
+        OverlayLight = "#1e1e2d80"
     };
 
     public string DarkLightModeButtonIcon => _isDarkMode switch
