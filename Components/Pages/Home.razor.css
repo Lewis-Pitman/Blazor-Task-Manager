@@ -1,0 +1,14 @@
+﻿*{
+    padding-top: 0 !important;
+}
+
+.header{
+    display: grid;
+    grid-template-columns: 70% 30%;
+}
+
+.header-options {
+    display: grid;
+    grid-template-columns: 30% 70%;
+    background-color: #7e6ff8;
+}

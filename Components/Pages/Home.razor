@@ -1,0 +1,54 @@
+﻿@page "/"
+
+@rendermode InteractiveServer
+
+<PageTitle>Home</PageTitle>
+
+<div class="header">
+    <MudTabs Elevation="0" Color="@Color.Primary">
+        <MudTabPanel Text="One" />
+        <MudTabPanel Text="Two" />
+        <MudTabPanel Text="Three" />
+        <MudTabPanel Text="Four" />
+        <MudTabPanel Text="Five" />
+        <MudTabPanel Text="Six" />
+        <MudTabPanel Text="Seven" />
+        <MudTabPanel Text="Eight" />
+        <MudTabPanel Text="Nine" />
+        <MudTabPanel Text="Ten" />
+        <MudTabPanel Text="Eleven" />
+        <MudTabPanel Text="Thirteen" />
+    </MudTabs>
+
+
+    <div class="header-options">
+    <MudSwitch @bind-Value="toggle" Color="Color.Secondary" Style="margin: auto;"/>
+
+    <MudToggleGroup T="string" Outlined="@_outlined" Delimiters="@_delimiters" Size="@_size" Color="@_color" Rounded="@_rounded" CheckMark="@_checkMark" FixedContent="@_fixedContent" Disabled="@_disabled" Style="width: 30rem">
+                <MudToggleItem Value="@("One")" />
+                <MudToggleItem Value="@("Two")" />
+                <MudToggleItem Value="@("Three")" />
+    </MudToggleGroup>
+    </div>
+
+</div>
+
+<div>
+    <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
+    <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
+    <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
+    <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
+</div>
+
+    @code{
+        public bool toggle;
+
+    Size _size = Size.Medium;
+    Color _color = Color.Secondary;
+    bool _rounded = false;
+    bool _checkMark = false;
+    bool _outlined = false;
+    bool _delimiters = false;
+    bool _fixedContent = false;
+    bool _disabled = false;
+    }
