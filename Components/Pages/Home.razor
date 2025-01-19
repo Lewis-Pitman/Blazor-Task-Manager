@@ -9,34 +9,47 @@
 <MudSnackbarProvider />
 
 <div class="header">
-    <MudTabs Elevation="0" MaxHeight="200">
-        <MudTabPanel Text="One" />
-        <MudTabPanel Text="Two" />
-        <MudTabPanel Text="Three" />
-        <MudTabPanel Text="Four" />
-        <MudTabPanel Text="Five" />
-        <MudTabPanel Text="Six" />
-        <MudTabPanel Text="Seven" />
-        <MudTabPanel Text="Eight" />
-        <MudTabPanel Text="Nine" />
-        <MudTabPanel Text="Ten" />
-        <MudTabPanel Text="Eleven" />
-        <MudTabPanel Text="Thirteen" />
-    </MudTabs>
+    <MudDynamicTabs 
+        @ref="@DynamicTabs" 
+        @bind-ActivePanelIndex="@UserIndex"
+        AddTab="@AddTabCallback" 
+        CloseTab="@CloseTabCallback"
+        AddIconToolTip="Add new" 
+        CloseIconToolTip="Close tab"
+        Elevation="0" 
+    >
+
+        @foreach (var tab in UserTabs)
+        {
+            <MudTabPanel ID="@tab.Id" Text="@tab.Label" ShowCloseIcon="@tab.ShowCloseIcon"></MudTabPanel>
+        }
+
+    </MudDynamicTabs>
 
 
     <div class="header-options">
         <MudSwitch 
-        @bind-Value="darkMode"
-        Color="Color.Primary"
-        UncheckedColor="Color.Primary"
-        Style="margin: auto;"
-        ThumbIcon="@(darkMode ? Icons.Material.Filled.DarkMode : Icons.Material.Filled.LightMode)" 
-        ThumbIconColor="Color.Info"
-        Size="Size.Large"
+            @bind-Value="darkMode"
+            Color="Color.Primary"
+            UncheckedColor="Color.Primary"
+            Style="margin: auto;"
+            ThumbIcon="@(darkMode ? Icons.Material.Filled.DarkMode : Icons.Material.Filled.LightMode)" 
+            ThumbIconColor="Color.Info"
+            Size="Size.Large"
         />
 
-        <MudToggleGroup T="string" @bind-Value="screen" Outlined="@_outlined" Delimiters="@_delimiters" Size="@_size" Rounded="@_rounded" CheckMark="@_checkMark" FixedContent="@_fixedContent" Disabled="@_disabled" Style="width: auto;">
+        <MudToggleGroup 
+            T="string" 
+            @bind-Value="screen" 
+            Outlined="false"
+            Delimiters="false"
+            Size="Size.Medium"
+            Rounded="false"
+            CheckMark="false"
+            FixedContent="false"
+            Disabled="false"
+            Style="width: auto;">
+
             <MudToggleItem Value="@("Dashboard")">
                 <MudIcon Icon="@Icons.Material.Filled.Home" />
             </MudToggleItem>
@@ -48,13 +61,14 @@
             <MudToggleItem Value="@("Kanban")">
                 <MudIcon Icon="@Icons.Material.Filled.ViewKanban" />
             </MudToggleItem>
+
         </MudToggleGroup>
     </div>
 
 </div>
 
 <div>
-    <p>Main content goes here</p>
+    <p>@UserTabs[UserIndex].Content</p>
 </div>
 
 
@@ -62,13 +76,87 @@
     public bool darkMode = true;
     public string screen = "Dashboard";
 
-    Size _size = Size.Medium;
-    Color _color = Color.Secondary;
-    bool _rounded = false;
-    bool _checkMark = false;
-    bool _outlined = false;
-    bool _delimiters = false;
-    bool _fixedContent = false;
-    bool _disabled = false;
+    #region Dynamic Tabs
+    public class TabView
+    {
+        public string Label { get; set; }
+        public string Content { get; set; }
+        public Guid Id { get; set; }
+        public bool ShowCloseIcon { get; set; } = true;
+    }
+
+    public MudDynamicTabs DynamicTabs;
+    public List<TabView> UserTabs = new();
+    public int UserIndex;
+    bool _stateHasChanged;
+    bool _showCloseIcon = false;
+    string _closeToggableTab = "Tab B";
+
+    void RestoreUserTabs()
+    {
+        UserTabs.Clear();
+        UserTabs.Add(new TabView {Id = Guid.NewGuid(), Label = "Tab A", Content = "Tab A content", ShowCloseIcon = false});
+        UserIndex = 0;
+        _stateHasChanged = true;
+    }
+
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+        RestoreUserTabs();
+    }
+
+    protected override void OnAfterRender(bool firstRender)
+    {
+        base.OnAfterRender(firstRender);
+        if (_stateHasChanged)
+        {
+            _stateHasChanged = false;
+
+            // Logic to set ShowCloseIcon to false if there is only one tab
+            UserTabs[0].ShowCloseIcon = UserTabs.Count <= 1 ? false : true;
+
+            StateHasChanged();
+        }
+    }
+
+    private void ToggleShowCloseIcon(bool show)
+    {
+        var tab = UserTabs?.SingleOrDefault(t => t.Label.Equals(_closeToggableTab));
+        if (tab is not null) tab.ShowCloseIcon = show;
+        _showCloseIcon = show;
+    }
+
+    public void AddTab(Guid id)
+    {
+        UserTabs.Add(new TabView {Id = id, Label = "dynamic tab", Content = $"Tab ID: {id}"});
+        UserIndex = UserTabs.Count - 1; // Automatically switch to the new tab.
+        _stateHasChanged = true;
+    }
+
+    public void RemoveTab(Guid id)
+    {
+        var tabView = UserTabs.SingleOrDefault((t) => Equals(t.Id, id));
+        var currentTabView = UserTabs[UserIndex];
+        if (tabView is not null)
+        {
+            // Would encounter exceptions when removing tabs due to main content's UserIndex being out of range
+            // Added logic here to ensure UserIndex updates properly to avoid the exception
+            int removingIndex = UserTabs.IndexOf(tabView);
+
+            bool currentTabIsRemoved = false;
+            if (currentTabView == tabView){ currentTabIsRemoved = true; }
+
+            UserTabs.Remove(tabView);
+
+            UserIndex = currentTabIsRemoved ? --UserIndex : UserTabs.IndexOf(currentTabView);
+
+            _stateHasChanged = true;
+        }
+    }
+
+    void AddTabCallback() => AddTab(Guid.NewGuid());
+    void CloseTabCallback(MudTabPanel panel) => RemoveTab((Guid)panel.ID);
+    #endregion
 
 }
