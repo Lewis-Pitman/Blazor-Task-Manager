@@ -1,5 +1,7 @@
 ﻿@page "/"
 
+@inject IDialogService DialogService
+
 @rendermode InteractiveServer
 
 <PageTitle>Home</PageTitle>
@@ -10,13 +12,13 @@
 
 <div class="header">
     <MudDynamicTabs 
-        @ref="@DynamicTabs" 
-        @bind-ActivePanelIndex="@UserIndex"
-        AddTab="@AddTabCallback" 
-        CloseTab="@CloseTabCallback"
-        AddIconToolTip="Add new" 
-        CloseIconToolTip="Close tab"
-        Elevation="0" 
+    @ref="@DynamicTabs" 
+    @bind-ActivePanelIndex="@UserIndex"
+    AddTab="@AddTabCallback" 
+    CloseTab="@CloseTabCallback"
+    AddIconToolTip="Add new" 
+    CloseIconToolTip="Close tab"
+    Elevation="0" 
     >
 
         @foreach (var tab in UserTabs)
@@ -29,26 +31,26 @@
 
     <div class="header-options">
         <MudSwitch 
-            @bind-Value="darkMode"
-            Color="Color.Primary"
-            UncheckedColor="Color.Primary"
-            Style="margin: auto;"
-            ThumbIcon="@(darkMode ? Icons.Material.Filled.DarkMode : Icons.Material.Filled.LightMode)" 
-            ThumbIconColor="Color.Info"
-            Size="Size.Large"
+        @bind-Value="darkMode"
+        Color="Color.Primary"
+        UncheckedColor="Color.Primary"
+        Style="margin: auto;"
+        ThumbIcon="@(darkMode ? Icons.Material.Filled.DarkMode : Icons.Material.Filled.LightMode)" 
+        ThumbIconColor="Color.Info"
+        Size="Size.Large"
         />
 
         <MudToggleGroup 
-            T="string" 
-            @bind-Value="screen" 
-            Outlined="false"
-            Delimiters="false"
-            Size="Size.Medium"
-            Rounded="false"
-            CheckMark="false"
-            FixedContent="false"
-            Disabled="false"
-            Style="width: auto;">
+        T="string" 
+        @bind-Value="screen" 
+        Outlined="false"
+        Delimiters="false"
+        Size="Size.Medium"
+        Rounded="false"
+        CheckMark="false"
+        FixedContent="false"
+        Disabled="false"
+        Style="width: auto;">
 
             <MudToggleItem Value="@("Dashboard")">
                 <MudIcon Icon="@Icons.Material.Filled.Home" />
@@ -65,6 +67,15 @@
         </MudToggleGroup>
     </div>
 
+    <MudMessageBox @ref="confirmDeleteMessage" Title="Warning" CancelText="Cancel">
+        <MessageContent>
+            Deleting this tab will <b>remove all its tasks.</b> this <b>cannot</b> be undone.
+        </MessageContent>
+        <YesButton>
+            <MudButton Variant="Variant.Filled" Color="Color.Error" StartIcon="@Icons.Material.Filled.DeleteForever">Delete</MudButton>
+        </YesButton>
+    </MudMessageBox>
+
 </div>
 
 <div>
@@ -75,6 +86,8 @@
 @code{
     public bool darkMode = true;
     public string screen = "Dashboard";
+
+    private MudMessageBox confirmDeleteMessage;
 
     #region Dynamic Tabs
     public class TabView
@@ -134,29 +147,45 @@
         _stateHasChanged = true;
     }
 
-    public void RemoveTab(Guid id)
+    public async void RemoveTab(Guid id)
     {
-        var tabView = UserTabs.SingleOrDefault((t) => Equals(t.Id, id));
-        var currentTabView = UserTabs[UserIndex];
-        if (tabView is not null)
+        bool? confirmRemove = await ConfirmDeleteAsync();
+
+        if (confirmRemove == true)
         {
-            // Would encounter exceptions when removing tabs due to main content's UserIndex being out of range
-            // Added logic here to ensure UserIndex updates properly to avoid the exception
-            int removingIndex = UserTabs.IndexOf(tabView);
 
-            bool currentTabIsRemoved = false;
-            if (currentTabView == tabView){ currentTabIsRemoved = true; }
+            var tabView = UserTabs.SingleOrDefault((t) => Equals(t.Id, id));
+            var currentTabView = UserTabs[UserIndex];
+            if (tabView is not null)
+            {
+                // Would encounter exceptions when removing tabs due to main content's UserIndex being out of range
+                // Added logic here to ensure UserIndex updates properly to avoid the exception
+                int removingIndex = UserTabs.IndexOf(tabView);
 
-            UserTabs.Remove(tabView);
+                bool currentTabIsRemoved = false;
+                if (currentTabView == tabView) { currentTabIsRemoved = true; }
 
-            UserIndex = currentTabIsRemoved ? --UserIndex : UserTabs.IndexOf(currentTabView);
+                UserTabs.Remove(tabView);
 
-            _stateHasChanged = true;
+                UserIndex = currentTabIsRemoved ? --UserIndex : UserTabs.IndexOf(currentTabView);
+                UserIndex = UserIndex < 0 ? 0 : UserIndex;
+
+                _stateHasChanged = true;
+            }
         }
     }
 
     void AddTabCallback() => AddTab(Guid.NewGuid());
     void CloseTabCallback(MudTabPanel panel) => RemoveTab((Guid)panel.ID);
     #endregion
+
+    private async Task<bool?> ConfirmDeleteAsync()
+    {
+        bool? result = await confirmDeleteMessage.ShowAsync();
+        result = result == null ? false : true;
+        StateHasChanged();
+
+        return result;
+    }
 
 }
