@@ -1,8 +1,11 @@
 ﻿@inherits LayoutComponentBase
 
+@using BlazorTaskManager.Components.Pages
+
 <MudThemeProvider Theme="@_theme" IsDarkMode="_isDarkMode" />
 <MudLayout>
     <MudMainContent Style="padding-top: 0px;">
+        <ControlHeader></ControlHeader>
         @Body
     </MudMainContent>
 </MudLayout>

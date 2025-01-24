@@ -1,10 +1,6 @@
-﻿@page "/"
-
-@inject IDialogService DialogService
+﻿@inject IDialogService DialogService
 
 @rendermode InteractiveServer
-
-<PageTitle>Home</PageTitle>
 
 <MudPopoverProvider />
 <MudDialogProvider />
@@ -77,11 +73,6 @@
     </MudMessageBox>
 
 </div>
-
-<div>
-    <p>@UserTabs[UserIndex].Content</p>
-</div>
-
 
 @code{
     public bool darkMode = true;
@@ -179,6 +170,7 @@
     void CloseTabCallback(MudTabPanel panel) => RemoveTab((Guid)panel.ID);
     #endregion
 
+    #region Deletion Confirmation
     private async Task<bool?> ConfirmDeleteAsync()
     {
         bool? result = await confirmDeleteMessage.ShowAsync();
@@ -187,5 +179,6 @@
 
         return result;
     }
+    #endregion
 
 }
