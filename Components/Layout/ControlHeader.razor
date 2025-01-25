@@ -9,15 +9,13 @@
 <div class="header">
     <!-- Dynamic tabs -->
 
-    <MudDynamicTabs 
-    @ref="@DynamicTabs" 
+    <MudDynamicTabs @ref="@DynamicTabs"
     @bind-ActivePanelIndex="@UserIndex"
-    AddTab="@AddTabCallback" 
+    AddTab="@AddTabCallback"
     CloseTab="@CloseTabCallback"
-    AddIconToolTip="Add new" 
+    AddIconToolTip="Add new"
     CloseIconToolTip="Close tab"
-    Elevation="0" 
-    >
+    Elevation="0">
 
         @foreach (var tab in UserTabs)
         {
@@ -29,18 +27,16 @@
     <!-- Dark/light toggle & screen select -->
     <div class="header-options">
         <MudSwitch 
-        @bind-Value="darkMode"
+        @bind-Value="DarkMode"
         Color="Color.Primary"
         UncheckedColor="Color.Primary"
         Style="margin: auto;"
-        ThumbIcon="@(darkMode ? Icons.Material.Filled.DarkMode : Icons.Material.Filled.LightMode)" 
+        ThumbIcon="@(darkMode ? Icons.Material.Filled.DarkMode : Icons.Material.Filled.LightMode)"
         ThumbIconColor="Color.Info"
-        Size="Size.Large"
-        />
+        Size="Size.Large" />
 
-        <MudToggleGroup 
-        T="string" 
-        @bind-Value="screen" 
+        <MudToggleGroup T="string"
+        @bind-Value="Screen"
         Outlined="false"
         Delimiters="false"
         Size="Size.Medium"
@@ -79,9 +75,9 @@
     <MudMessageBox @ref="createTabMessage" Title="New tab" CancelText="Cancel">
         <MessageContent>
             <p>Please name your new tab</p>
-            <br/>
+            <br />
             <MudInputString Placeholder="Name" @bind-Value="newTabName" />
-            <br/>
+            <br />
         </MessageContent>
         <YesButton>
             <MudButton Variant="Variant.Filled" Color="Color.Success" StartIcon="@Icons.Material.Filled.Check">Create</MudButton>
@@ -90,16 +86,55 @@
 
 </div>
 
-@code{
-    public bool darkMode = true;
-    public string screen = "Dashboard";
+@code {
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+        RestoreUserTabs();
 
+        OnScreenChange.InvokeAsync(screen);
+        OnDarkModeToggle.InvokeAsync(darkMode);
+    }
+
+    #region Child to parent bindings
+    [Parameter]
+    public EventCallback<string> OnScreenChange { get; set; }
+
+    [Parameter]
+    public EventCallback<bool> OnDarkModeToggle { get; set; }
+
+    private string screen = "Dashboard";
+
+    public string Screen
+    {
+        get { return screen; }
+        set
+        {
+            screen = value;
+            OnScreenChange.InvokeAsync(screen);
+        }
+    }
+
+    private bool darkMode = true;
+
+    public bool DarkMode
+    {
+        get { return darkMode; }
+        set
+        {
+            darkMode = value;
+            OnDarkModeToggle.InvokeAsync(darkMode);
+        }
+    }
+    #endregion
+
+
+    #region Dynamic Tabs
     private MudMessageBox confirmDeleteMessage;
     private MudMessageBox createTabMessage;
 
     public string newTabName;
 
-    #region Dynamic Tabs
     public class TabView
     {
         public string Label { get; set; }
@@ -118,16 +153,12 @@
     void RestoreUserTabs()
     {
         UserTabs.Clear();
-        UserTabs.Add(new TabView {Id = Guid.NewGuid(), Label = "Tab A", Content = "Tab A content", ShowCloseIcon = false});
+        UserTabs.Add(new TabView { Id = Guid.NewGuid(), Label = "Tab A", Content = "Tab A content", ShowCloseIcon = false });
         UserIndex = 0;
         _stateHasChanged = true;
     }
 
-    protected override void OnInitialized()
-    {
-        base.OnInitialized();
-        RestoreUserTabs();
-    }
+    
 
     protected override void OnAfterRender(bool firstRender)
     {

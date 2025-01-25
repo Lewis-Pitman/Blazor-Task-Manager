@@ -1,7 +1,29 @@
 ﻿@page "/"
 
-<p>Test!</p>
+@rendermode InteractiveServer
+
+@using BlazorTaskManager.Components.Layout
+
+<ControlHeader OnScreenChange="SetScreen" OnDarkModeToggle="ToggleDarkMode" />
+
+<p>Index</p>
+
+<p>@CurrentScreen</p>
+<p>@IsDarkMode</p>
 
 @code {
+    private string CurrentScreen { get; set; }
+    private bool IsDarkMode { get; set; }
 
+    private void SetScreen(string newScreen)
+    {
+        CurrentScreen = newScreen;
+        StateHasChanged();
+    }
+
+    private void ToggleDarkMode(bool isDarkMode)
+    {
+        IsDarkMode = isDarkMode;
+        StateHasChanged();
+    }
 }
