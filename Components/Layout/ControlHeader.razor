@@ -7,6 +7,8 @@
 <MudSnackbarProvider />
 
 <div class="header">
+    <!-- Dynamic tabs -->
+
     <MudDynamicTabs 
     @ref="@DynamicTabs" 
     @bind-ActivePanelIndex="@UserIndex"
@@ -24,7 +26,7 @@
 
     </MudDynamicTabs>
 
-
+    <!-- Dark/light toggle & screen select -->
     <div class="header-options">
         <MudSwitch 
         @bind-Value="darkMode"
@@ -63,12 +65,26 @@
         </MudToggleGroup>
     </div>
 
+
+    <!-- Message popups -->
     <MudMessageBox @ref="confirmDeleteMessage" Title="Warning" CancelText="Cancel">
         <MessageContent>
             Deleting this tab will <b>remove all its tasks.</b> this <b>cannot</b> be undone.
         </MessageContent>
         <YesButton>
             <MudButton Variant="Variant.Filled" Color="Color.Error" StartIcon="@Icons.Material.Filled.DeleteForever">Delete</MudButton>
+        </YesButton>
+    </MudMessageBox>
+
+    <MudMessageBox @ref="createTabMessage" Title="New tab" CancelText="Cancel">
+        <MessageContent>
+            <p>Please name your new tab</p>
+            <br/>
+            <MudInputString Placeholder="Name" @bind-Value="newTabName" />
+            <br/>
+        </MessageContent>
+        <YesButton>
+            <MudButton Variant="Variant.Filled" Color="Color.Success" StartIcon="@Icons.Material.Filled.Check">Create</MudButton>
         </YesButton>
     </MudMessageBox>
 
@@ -79,6 +95,9 @@
     public string screen = "Dashboard";
 
     private MudMessageBox confirmDeleteMessage;
+    private MudMessageBox createTabMessage;
+
+    public string newTabName;
 
     #region Dynamic Tabs
     public class TabView
@@ -131,11 +150,18 @@
         _showCloseIcon = show;
     }
 
-    public void AddTab(Guid id)
+    public async void AddTab(Guid id)
     {
-        UserTabs.Add(new TabView {Id = id, Label = "dynamic tab", Content = $"Tab ID: {id}"});
-        UserIndex = UserTabs.Count - 1; // Automatically switch to the new tab.
-        _stateHasChanged = true;
+        bool? confirmCreate = await NameTabAsync();
+
+        if (confirmCreate == true)
+        {
+            UserTabs.Add(new TabView { Id = id, Label = newTabName, Content = $"Tab ID: {id}" });
+            UserIndex = UserTabs.Count - 1; // Automatically switch to the new tab.
+            _stateHasChanged = true;
+        }
+
+        newTabName = "";
     }
 
     public async void RemoveTab(Guid id)
@@ -170,10 +196,19 @@
     void CloseTabCallback(MudTabPanel panel) => RemoveTab((Guid)panel.ID);
     #endregion
 
-    #region Deletion Confirmation
+    #region Message popups
     private async Task<bool?> ConfirmDeleteAsync()
     {
         bool? result = await confirmDeleteMessage.ShowAsync();
+        result = result == null ? false : true;
+        StateHasChanged();
+
+        return result;
+    }
+
+    private async Task<bool?> NameTabAsync()
+    {
+        bool? result = await createTabMessage.ShowAsync();
         result = result == null ? false : true;
         StateHasChanged();
 
