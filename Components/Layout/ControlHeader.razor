@@ -2,14 +2,16 @@
 
 @rendermode InteractiveServer
 
+@using BlazorTaskManager.Models
+
 <MudPopoverProvider />
 <MudDialogProvider />
 <MudSnackbarProvider />
 
 <div class="header">
     <!-- Dynamic tabs -->
-
-    <MudDynamicTabs @ref="@DynamicTabs"
+    <MudDynamicTabs 
+    @ref="@DynamicTabs"
     @bind-ActivePanelIndex="@UserIndex"
     AddTab="@AddTabCallback"
     CloseTab="@CloseTabCallback"
@@ -96,12 +98,15 @@
         OnDarkModeToggle.InvokeAsync(darkMode);
     }
 
-    #region Child to parent bindings
+    #region Properties
     [Parameter]
     public EventCallback<string> OnScreenChange { get; set; }
 
     [Parameter]
     public EventCallback<bool> OnDarkModeToggle { get; set; }
+
+    [Parameter]
+    public EventCallback<Guid> OnActiveTabChange { get; set; }
 
     private string screen = "Dashboard";
 
@@ -126,26 +131,44 @@
             OnDarkModeToggle.InvokeAsync(darkMode);
         }
     }
+
+    private Guid currentTabId;
+
+    public Guid CurrentTabId
+    {
+        get { return currentTabId; }
+        set
+        {
+            currentTabId = value;
+            OnActiveTabChange.InvokeAsync(currentTabId);
+        }
+    }
     #endregion
 
-
     #region Dynamic Tabs
-    private MudMessageBox confirmDeleteMessage;
-    private MudMessageBox createTabMessage;
-
-    public string newTabName;
-
-    public class TabView
-    {
-        public string Label { get; set; }
-        public string Content { get; set; }
-        public Guid Id { get; set; }
-        public bool ShowCloseIcon { get; set; } = true;
-    }
-
+    // This code is taken from https://mudblazor.com/components/tabs#dynamic-tabs and modified where needed
     public MudDynamicTabs DynamicTabs;
     public List<TabView> UserTabs = new();
-    public int UserIndex;
+
+    private int userIndex;
+
+    public int UserIndex
+    {
+        get { return userIndex; }
+        set
+        {
+            userIndex = value;
+            try
+            {
+                CurrentTabId = UserTabs[value].Id;
+            }
+            catch{
+                CurrentTabId = UserTabs[0].Id;
+            }
+    }
+    }
+
+
     bool _stateHasChanged;
     bool _showCloseIcon = false;
     string _closeToggableTab = "Tab B";
@@ -153,12 +176,10 @@
     void RestoreUserTabs()
     {
         UserTabs.Clear();
-        UserTabs.Add(new TabView { Id = Guid.NewGuid(), Label = "Tab A", Content = "Tab A content", ShowCloseIcon = false });
+        UserTabs.Add(new TabView { Id = Guid.NewGuid(), Label = "Untitled", TaskList = new List<TaskItem>(), ShowCloseIcon = false });
         UserIndex = 0;
         _stateHasChanged = true;
     }
-
-    
 
     protected override void OnAfterRender(bool firstRender)
     {
@@ -167,7 +188,7 @@
         {
             _stateHasChanged = false;
 
-            // Logic to set ShowCloseIcon to false if there is only one tab
+            // Set ShowCloseIcon to false if there is only one tab
             UserTabs[0].ShowCloseIcon = UserTabs.Count <= 1 ? false : true;
 
             StateHasChanged();
@@ -187,7 +208,7 @@
 
         if (confirmCreate == true)
         {
-            UserTabs.Add(new TabView { Id = id, Label = newTabName, Content = $"Tab ID: {id}" });
+            UserTabs.Add(new TabView { Id = id, Label = newTabName, TaskList = new List<TaskItem>() });
             UserIndex = UserTabs.Count - 1; // Automatically switch to the new tab.
             _stateHasChanged = true;
         }
@@ -228,6 +249,12 @@
     #endregion
 
     #region Message popups
+    // This code is taken from https://mudblazor.com/components/messagebox#api and modified where needed
+    private MudMessageBox confirmDeleteMessage;
+    private MudMessageBox createTabMessage;
+
+    public string newTabName;
+
     private async Task<bool?> ConfirmDeleteAsync()
     {
         bool? result = await confirmDeleteMessage.ShowAsync();

@@ -1,7 +1,10 @@
 using BlazorTaskManager.Components;
+using BlazorTaskManager.Database;
+using Microsoft.EntityFrameworkCore;
 using MudBlazor.Services;
 
 var builder = WebApplication.CreateBuilder(args);
+var connectionString = builder.Configuration.GetConnectionString("TabDB");
 
 // Add MudBlazor services
 builder.Services.AddMudServices();
@@ -9,6 +12,8 @@ builder.Services.AddMudServices();
 // Add services to the container.
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
+
+builder.Services.AddDbContextFactory<TabContext>(options => options.UseSqlite(connectionString));
 
 var app = builder.Build();
 

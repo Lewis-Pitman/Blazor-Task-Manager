@@ -3,17 +3,38 @@
 @rendermode InteractiveServer
 
 @using BlazorTaskManager.Components.Layout
+@using BlazorTaskManager.Components.Screens
 
-<ControlHeader OnScreenChange="SetScreen" OnDarkModeToggle="ToggleDarkMode" />
+<!-- Header -->
+<ControlHeader OnScreenChange="SetScreen" OnDarkModeToggle="ToggleDarkMode" OnActiveTabChange="SetCurrentTab" />
 
-<p>Index</p>
+<!-- Screens -->
+@switch(CurrentScreen){
+    case "Task list":
+        <TaskList />
+        break;
 
-<p>@CurrentScreen</p>
-<p>@IsDarkMode</p>
+    case "Kanban":
+        <Kanban />
+        break;
+
+    default:
+        <Dashboard />
+        break;
+}
+
+<p>Current tab ID: @CurrentTabId</p>
 
 @code {
+    private Guid CurrentTabId { get; set; }
+
     private string CurrentScreen { get; set; }
     private bool IsDarkMode { get; set; }
+
+    private void SetCurrentTab(Guid currentTabId){
+        CurrentTabId = currentTabId;
+        StateHasChanged();
+    }
 
     private void SetScreen(string newScreen)
     {
