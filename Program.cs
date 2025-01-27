@@ -1,5 +1,6 @@
 using BlazorTaskManager.Components;
 using BlazorTaskManager.Database;
+using BlazorTaskManager.Services;
 using Microsoft.EntityFrameworkCore;
 using MudBlazor.Services;
 
@@ -13,7 +14,14 @@ builder.Services.AddMudServices();
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
 
+// Enable detailed errors
+builder.Services.AddServerSideBlazor().AddCircuitOptions(options => options.DetailedErrors = true);
+
 builder.Services.AddDbContextFactory<TabContext>(options => options.UseSqlite(connectionString));
+builder.Services.AddDbContextFactory<TaskContext>(options => options.UseSqlite(connectionString));
+
+builder.Services.AddTransient<TabService>();
+builder.Services.AddTransient<TaskService>();
 
 var app = builder.Build();
 

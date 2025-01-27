@@ -1,6 +1,26 @@
-﻿<h3>EditTask</h3>
+﻿@inject TaskService taskService
+
+@rendermode InteractiveServer
+
+<h3>EditTask</h3>
+
+<EditForm Model="@taskItem" OnValidSubmit="HandleSubmit">
+    <input type="text" placeholder="title" @bind-value="@taskItem.Title" />
+    <input type="text" placeholder="description" @bind-value="@taskItem.Description" />
+    <input type="text" placeholder="status" @bind-value="@taskItem.Status" />
+    <button type="submit">Submit</button>
+</EditForm>
 
 @code {
-	[Parameter]
-	public Guid TaskId { get; set; }
+    [Parameter]
+    public Guid CurrentTabId { get; set; }
+
+    public TaskItem taskItem = new TaskItem();
+
+    public void HandleSubmit()
+    {
+        taskItem.Id = new Guid();
+        taskItem.TabId = CurrentTabId;
+        taskService.AddTask(taskItem);
+    }
 }

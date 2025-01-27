@@ -2,9 +2,6 @@
 
 @rendermode InteractiveServer
 
-@using BlazorTaskManager.Components.Layout
-@using BlazorTaskManager.Components.Screens
-
 <!-- Header -->
 <ControlHeader OnScreenChange="SetScreen" OnDarkModeToggle="ToggleDarkMode" OnActiveTabChange="SetCurrentTab" />
 
@@ -23,9 +20,27 @@
         break;
 }
 
+<!-- Temporary to check task item is working -->
+
+<InputCheckbox @bind-Value="@isEditing">Edit task</InputCheckbox>
+<InputCheckbox @bind-Value="@isViewing">View task</InputCheckbox>
+
+@if(isEditing){
+    <EditTask CurrentTabId="@CurrentTabId" />
+}
+else if(isViewing){
+    <ViewTask />
+}
+
 <p>Current tab ID: @CurrentTabId</p>
 
 @code {
+    // Task debugging
+    public bool isEditing = false;
+    public bool isViewing = false;
+    public TaskItem currentTask = new TaskItem();
+
+
     private Guid CurrentTabId { get; set; }
 
     private string CurrentScreen { get; set; }

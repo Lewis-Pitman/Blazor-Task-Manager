@@ -1,24 +1,34 @@
-﻿using BlazorTaskManager.Models;
+﻿using BlazorTaskManager.Database;
+using BlazorTaskManager.Models;
+using Microsoft.EntityFrameworkCore;
+using System.Threading.Tasks;
 
 namespace BlazorTaskManager.Services
 {
     public class TabService
     {
+
+        private IDbContextFactory<TabContext> _dbContextFactory;
+
+        public TabService(IDbContextFactory<TabContext> dbContextFactory)
+        {
+            _dbContextFactory = dbContextFactory;
+        }
+
         public List<TabView> GetAllTabs()
         {
-            return null;
+            using (var context = _dbContextFactory.CreateDbContext())
+            {
+                return context.Tabs.ToList();
+            }
         }
-
-        public List<Guid> GetAllTabIds()
+        public void AddTab(TabView tab)
         {
-            // Returns all tabs with their Id and Label
-            return null;
-        }
-
-        public TabView GetTab(Guid tabId)
-        {
-            // Returns a TabView with the given Id
-            return null;
+            using (var context = _dbContextFactory.CreateDbContext())
+            {
+                context.Tabs.Add(tab);
+                context.SaveChanges();
+            }
         }
     }
 }

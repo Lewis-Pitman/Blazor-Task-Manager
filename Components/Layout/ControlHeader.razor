@@ -1,9 +1,7 @@
 ﻿@inject IDialogService DialogService
+@inject TabService tabService
 
 @rendermode InteractiveServer
-
-@using BlazorTaskManager.Models
-@using BlazorTaskManager.Services
 
 <MudPopoverProvider />
 <MudDialogProvider />
@@ -178,10 +176,9 @@
         // Retrieve tabs from database or initialise with "Untitled" tab if empty
         UserTabs.Clear();
 
-        TabService tabService = new();
         List<TabView> allTabs = tabService.GetAllTabs();
 
-        if (allTabs != null)
+        if (allTabs.Count != 0)
         {
             foreach(TabView tab in allTabs){
                 UserTabs.Add(tab);
@@ -216,7 +213,7 @@
 
         if (confirmCreate == true)
         {
-            UserTabs.Add(new TabView { Id = id, Label = newTabName, TaskList = new List<TaskItem>() });
+            UserTabs.Add(new TabView { Id = id, Label = newTabName });
             UserIndex = UserTabs.Count - 1; // Automatically switch to the new tab.
             _stateHasChanged = true;
         }
