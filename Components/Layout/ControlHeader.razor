@@ -3,6 +3,7 @@
 @rendermode InteractiveServer
 
 @using BlazorTaskManager.Models
+@using BlazorTaskManager.Services
 
 <MudPopoverProvider />
 <MudDialogProvider />
@@ -165,18 +166,32 @@
             catch{
                 CurrentTabId = UserTabs[0].Id;
             }
-    }
+        }
     }
 
 
     bool _stateHasChanged;
     bool _showCloseIcon = false;
-    string _closeToggableTab = "Tab B";
 
     void RestoreUserTabs()
     {
+        // Retrieve tabs from database or initialise with "Untitled" tab if empty
         UserTabs.Clear();
-        UserTabs.Add(new TabView { Id = Guid.NewGuid(), Label = "Untitled", TaskList = new List<TaskItem>(), ShowCloseIcon = false });
+
+        TabService tabService = new();
+        List<TabView> allTabs = tabService.GetAllTabs();
+
+        if (allTabs != null)
+        {
+            foreach(TabView tab in allTabs){
+                UserTabs.Add(tab);
+            }
+        }
+        else
+        {
+            UserTabs.Add(new TabView { Label = "Untitled", ShowCloseIcon = false });
+        }
+
         UserIndex = 0;
         _stateHasChanged = true;
     }
@@ -193,13 +208,6 @@
 
             StateHasChanged();
         }
-    }
-
-    private void ToggleShowCloseIcon(bool show)
-    {
-        var tab = UserTabs?.SingleOrDefault(t => t.Label.Equals(_closeToggableTab));
-        if (tab is not null) tab.ShowCloseIcon = show;
-        _showCloseIcon = show;
     }
 
     public async void AddTab(Guid id)

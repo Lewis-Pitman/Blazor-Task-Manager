@@ -4,7 +4,12 @@ namespace BlazorTaskManager.Services
 {
     public class TabService
     {
-        public List<(Guid, string)> GetAllTabs()
+        public List<TabView> GetAllTabs()
+        {
+            return null;
+        }
+
+        public List<Guid> GetAllTabIds()
         {
             // Returns all tabs with their Id and Label
             return null;
