@@ -1,5 +1,59 @@
-﻿<h1>Dashboard</h1>
+﻿@inject TaskService taskService
+
+<h1 class="title">Dashboard</h1>
+
+<div class="task-stats">
+	<div>
+		<p>To-do</p>
+		<p>@todoTasks</p>
+	</div>
+
+	<div>
+		<p>In progress</p>
+		<p>@inProgressTasks</p>
+	</div>
+
+	<div>
+		<p>Done</p>
+		<p>@doneTasks</p>
+	</div>
+</div>
+
+@if(todaysTasks != null)
+{
+	foreach(var task in todaysTasks)
+	{
+		<p>Title: @task.Title   Description: @task.Description    Status: @task.Status</p>
+		<br />
+	}
+}
+else
+{
+	<p>You have no tasks due today</p>
+}
 
 @code {
-	
+	[Parameter]
+	public Guid CurrentTabId { get; set; }
+
+	// Tab stats
+	private int todoTasks;
+	private int inProgressTasks;
+	private int doneTasks;
+
+	private List<TaskItem>? todaysTasks;
+
+	protected override void OnParametersSet()
+	{
+		var allTasks = taskService.GetAllTasksWithTabId(CurrentTabId);
+
+		todoTasks = allTasks.Where(task => task.Status == "To-do").Count();
+		inProgressTasks = allTasks.Where(task => task.Status == "In progress").Count();
+		doneTasks = allTasks.Where(task => task.Status == "Done").Count();
+
+		// Migration needs to be done for this to not error
+		//todaysTasks = taskService.GetTaskByDate(DateTime.Today);
+
+		base.OnParametersSet();
+	}
 }

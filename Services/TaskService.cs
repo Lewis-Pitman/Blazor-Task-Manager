@@ -30,13 +30,6 @@ namespace BlazorTaskManager.Services
             }
         }
 
-        public List<TaskItem> GetTaskWithStatus(string status)
-        {
-            using (var context = _dbContextFactory.CreateDbContext())
-            {
-                return context.TaskItem.Where(item => item.Status == status).ToList();
-            }
-        }
 
         public void AddTask(TaskItem task)
         {
@@ -46,5 +39,74 @@ namespace BlazorTaskManager.Services
                 context.SaveChanges();
             }
         }
+
+        public void EditTask(Guid taskToEdit, TaskItem task)
+        {
+            using (var context = _dbContextFactory.CreateDbContext())
+            {
+                var existingTask = context.TaskItem.Find(taskToEdit);
+
+                if (existingTask != null)
+                {
+                    existingTask.Title = task.Title;
+                    existingTask.Description = task.Description;
+                    existingTask.Status = task.Status;
+                    // Add due date
+
+                    context.SaveChanges();
+                }
+            }
+        }
+
+        public void RemoveTask(TaskItem task)
+        {
+            using (var context = _dbContextFactory.CreateDbContext())
+            {
+                context.TaskItem.Remove(task);
+                context.SaveChanges();
+            }
+        }
+
+        public void RemoveAllTasksWithTabId(Guid tabId)
+        {
+            using (var context = _dbContextFactory.CreateDbContext())
+            {
+                var tasksToRemove = context.TaskItem.Where(task => task.TabId == tabId).ToList();
+
+                foreach (var task in tasksToRemove)
+                {
+                    context.TaskItem.Remove(task);
+                }
+
+                context.SaveChanges();
+            }
+        }
+
+        // Search
+        public List<TaskItem> GetTaskWithStatus(string status)
+        {
+            using (var context = _dbContextFactory.CreateDbContext())
+            {
+                return context.TaskItem.Where(item => item.Status == status).ToList();
+            }
+        }
+
+        public List<TaskItem> GetTaskWithTitle(string title)
+        {
+            using (var context = _dbContextFactory.CreateDbContext())
+            {
+                return context.TaskItem.Where(item => item.Title == title).ToList();
+            }
+        }
+
+        /*
+        public List<TaskItem> GetTaskByDate(DateTime dateTime)
+        {
+            using (var context = _dbContextFactory.CreateDbContext())
+            {
+                return context.TaskItem.Where(item => item.dueDate == dateTime).ToList();
+            }
+        }
+        */
     }
 }

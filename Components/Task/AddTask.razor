@@ -2,7 +2,7 @@
 
 @rendermode InteractiveServer
 
-<h1>Edit Task</h1>
+<h1>AddTask</h1>
 
 <EditForm Model="@taskItem" OnValidSubmit="HandleSubmit">
     <input type="text" placeholder="title" @bind-value="@taskItem.Title" />
@@ -13,14 +13,20 @@
 
 @code {
     [Parameter]
-    public EventCallback OnSubmitClicked { get; set; }
+    public Guid CurrentTabId { get; set; }
 
     [Parameter]
-    public TaskItem taskItem { get; set; }
+    public EventCallback OnSubmitClicked { get; set; }
+
+    public TaskItem taskItem = new TaskItem();
 
     public void HandleSubmit()
     {
-        taskService.EditTask(taskItem.Id, taskItem);
+        taskItem.Id = new Guid();
+        taskItem.TabId = CurrentTabId;
+        taskService.AddTask(taskItem);
+
+        taskItem = new TaskItem();
 
         OnSubmitClicked.InvokeAsync();
     }

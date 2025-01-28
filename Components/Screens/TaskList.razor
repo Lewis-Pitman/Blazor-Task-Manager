@@ -1,5 +1,26 @@
-﻿<h3>TaskList</h3>
+﻿@inject TaskService taskService
+
+<h1>TaskList</h1>
+
+@foreach(var task in allTasks){
+    <p>Title: @task.Title   Description: @task.Description    Status: @task.Status</p>
+    <br />
+}
 
 @code {
+    [Parameter]
+    public Guid CurrentTabId { get; set; }
 
+    [Parameter]
+    public bool StateHasChanged { get; set; }
+
+    private List<TaskItem> allTasks;
+
+    protected override void OnParametersSet()
+    {
+        allTasks = taskService.GetAllTasksWithTabId(CurrentTabId);
+        StateHasChanged = false;
+
+        base.OnParametersSet();
+    }
 }

@@ -1,7 +1,26 @@
-﻿<h1>ViewTask</h1>
+﻿<h1>@taskItem.Title</h1>
 
+<MudDivider />
+
+<div class="main">
+    <p>@taskItem.Description</p>
+    <div class="sidepanel">
+        <div>
+            <span class="circle red"/>
+            <p>@taskItem.Status</p>
+        </div>
+
+        <!-- Replace below with due date -->
+        <div>
+            <span class="circle green"/>
+            <p>@taskItem.Status</p>
+        </div>
+    </div>
+</div>
 
 
 @code {
+    [Parameter]
+    public TaskItem taskItem { get; set; }
 
 }

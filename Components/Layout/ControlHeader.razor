@@ -1,5 +1,6 @@
 ﻿@inject IDialogService DialogService
 @inject TabService tabService
+@inject TaskService taskService
 
 @rendermode InteractiveServer
 
@@ -73,9 +74,9 @@
         </YesButton>
     </MudMessageBox>
 
-    <MudMessageBox @ref="createTabMessage" Title="New tab" CancelText="Cancel">
+    <MudMessageBox @ref="createTabMessage" Title="@(editingName ? "Edit tab name" : "Create new tab")" CancelText="Cancel">
         <MessageContent>
-            <p>Please name your new tab</p>
+            <p>Please name your tab</p>
             <br />
             <MudInputString Placeholder="Name" @bind-Value="newTabName" />
             <br />
@@ -186,7 +187,11 @@
         }
         else
         {
-            UserTabs.Add(new TabView { Label = "Untitled", ShowCloseIcon = false });
+            // Make a new untitled tab and add it to the database
+            TabView newTab = new TabView { Label = "Untitled", ShowCloseIcon = false };
+
+            UserTabs.Add(newTab);
+            tabService.AddTab(newTab);
         }
 
         UserIndex = 0;
@@ -209,12 +214,18 @@
 
     public async void AddTab(Guid id)
     {
+        // Confirmation message
         bool? confirmCreate = await NameTabAsync();
 
         if (confirmCreate == true)
         {
-            UserTabs.Add(new TabView { Id = id, Label = newTabName });
+            TabView newTab = new TabView { Id = id, Label = newTabName };
+            UserTabs.Add(newTab);
             UserIndex = UserTabs.Count - 1; // Automatically switch to the new tab.
+
+            // Add new tab to database
+            tabService.AddTab(newTab);
+
             _stateHasChanged = true;
         }
 
@@ -223,6 +234,7 @@
 
     public async void RemoveTab(Guid id)
     {
+        // Confirmation message
         bool? confirmRemove = await ConfirmDeleteAsync();
 
         if (confirmRemove == true)
@@ -244,6 +256,12 @@
                 UserIndex = currentTabIsRemoved ? --UserIndex : UserTabs.IndexOf(currentTabView);
                 UserIndex = UserIndex < 0 ? 0 : UserIndex;
 
+                // Remove all tasks in the tab from the database
+                taskService.RemoveAllTasksWithTabId(tabView.Id);
+
+                // Remove tab from database
+                tabService.RemoveTab(tabView);
+
                 _stateHasChanged = true;
             }
         }
@@ -259,6 +277,7 @@
     private MudMessageBox createTabMessage;
 
     public string newTabName;
+    private bool editingName;
 
     private async Task<bool?> ConfirmDeleteAsync()
     {

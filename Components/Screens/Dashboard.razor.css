@@ -1,0 +1,31 @@
+﻿.title{
+    top: 0px;
+    padding-bottom: 10px;
+    width: 100%;
+    background-color: black;
+    color: white;
+}
+
+.task-stats{
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    margin: auto;
+}
+
+.task-stats::deep{
+    display: grid;
+    height: 50%;
+    grid-template-rows: 1fr 3fr;
+    margin: auto;
+}
+
+p {
+    text-align: center;
+    font-size: large;
+    font-weight: bold;
+}
+
+h1 {
+    text-align: center;
+    font-size: medium;
+}

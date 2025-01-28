@@ -22,6 +22,7 @@ namespace BlazorTaskManager.Services
                 return context.Tabs.ToList();
             }
         }
+
         public void AddTab(TabView tab)
         {
             using (var context = _dbContextFactory.CreateDbContext())
@@ -30,5 +31,15 @@ namespace BlazorTaskManager.Services
                 context.SaveChanges();
             }
         }
+
+        public void RemoveTab(TabView tab)
+        {
+            using (var context = _dbContextFactory.CreateDbContext())
+            {
+                context.Tabs.Remove(tab);
+                context.SaveChanges();
+            }
+        }
+
     }
 }

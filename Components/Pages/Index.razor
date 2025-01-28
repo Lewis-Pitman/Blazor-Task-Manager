@@ -2,49 +2,80 @@
 
 @rendermode InteractiveServer
 
+@inject TabService tabService
+@inject TaskService taskService
+
 <!-- Header -->
 <ControlHeader OnScreenChange="SetScreen" OnDarkModeToggle="ToggleDarkMode" OnActiveTabChange="SetCurrentTab" />
 
 <!-- Screens -->
-@switch(CurrentScreen){
-    case "Task list":
-        <TaskList />
-        break;
+@if(!isEditing && !isViewing)
+{
+    @switch(CurrentScreen){
+        case "Task list":
+            <TaskList CurrentTabId="@CurrentTabId" StateHasChanged="@taskListStateHasChanged" />
 
-    case "Kanban":
-        <Kanban />
-        break;
+            <p>Add task:</p>
+            <InputCheckbox @bind-Value="isEditing" />
+            <br />
 
-    default:
-        <Dashboard />
-        break;
+            if (isEditing)
+            {
+                <AddTask CurrentTabId="@CurrentTabId" OnSubmitClicked="@OnSubmitClicked" />
+                <button @onclick="DeleteAllClicked">Delete all</button>
+            }
+            break;
+
+        case "Kanban":
+            <Kanban />
+
+            <!-- Temporary element below to test viewing a task -->
+            <ViewTask taskItem="@(new TaskItem{Title = "View test", Description = "This is a description", Status = "To-do" })" />
+            break;
+
+        default:
+            <Dashboard CurrentTabId="@CurrentTabId" />
+            break;
+    }
+}
+else{
+    if(isViewing)
+    {
+        <ViewTask taskItem="@(new TaskItem())" />
+    }
+    else
+    {
+        <EditTask taskItem="@(new TaskItem())" />
+    }
 }
 
-<!-- Temporary to check task item is working -->
-
-<InputCheckbox @bind-Value="@isEditing">Edit task</InputCheckbox>
-<InputCheckbox @bind-Value="@isViewing">View task</InputCheckbox>
-
-@if(isEditing){
-    <EditTask CurrentTabId="@CurrentTabId" />
-}
-else if(isViewing){
-    <ViewTask />
-}
-
-<p>Current tab ID: @CurrentTabId</p>
+<p>isViewing:</p> <InputCheckbox @bind-Value="@isViewing" />
 
 @code {
-    // Task debugging
-    public bool isEditing = false;
-    public bool isViewing = false;
-    public TaskItem currentTask = new TaskItem();
-
-
     private Guid CurrentTabId { get; set; }
 
     private string CurrentScreen { get; set; }
     private bool IsDarkMode { get; set; }
+
+    // Temporary..?
+    private bool isEditing = false;
+    private bool isViewing = false;
+
+    private bool taskListStateHasChanged = false;
+
+    private void OnSubmitClicked(){
+        taskListStateHasChanged = true;
+    }
+
+    private void DeleteAllClicked()
+    {
+        var allTabs = tabService.GetAllTabs();
+
+        foreach(var tab in allTabs){
+            taskService.RemoveAllTasksWithTabId(tab.Id);
+            tabService.RemoveTab(tab);
+        }
+    }
 
     private void SetCurrentTab(Guid currentTabId){
         CurrentTabId = currentTabId;
