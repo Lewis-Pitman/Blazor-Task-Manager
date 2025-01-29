@@ -58,10 +58,10 @@ else{
     private bool IsDarkMode { get; set; }
 
     // Temporary..?
-    private bool isEditing = false;
-    private bool isViewing = false;
+    private bool isEditing;
+    private bool isViewing;
 
-    private bool taskListStateHasChanged = false;
+    private bool taskListStateHasChanged;
 
     private void OnSubmitClicked(){
         taskListStateHasChanged = true;
