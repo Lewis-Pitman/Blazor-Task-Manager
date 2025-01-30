@@ -7,9 +7,9 @@ namespace BlazorTaskManager.Services
 {
     public class TaskService
     {
-        private IDbContextFactory<TaskContext> _dbContextFactory;
+        private IDbContextFactory<TabContext> _dbContextFactory;
 
-        public TaskService(IDbContextFactory<TaskContext> dbContextFactory)
+        public TaskService(IDbContextFactory<TabContext> dbContextFactory)
         {
             _dbContextFactory = dbContextFactory;
         }
@@ -99,7 +99,7 @@ namespace BlazorTaskManager.Services
             }
         }
 
-        /*
+        
         public List<TaskItem> GetTaskByDate(DateTime dateTime)
         {
             using (var context = _dbContextFactory.CreateDbContext())
@@ -107,6 +107,6 @@ namespace BlazorTaskManager.Services
                 return context.TaskItem.Where(item => item.dueDate == dateTime).ToList();
             }
         }
-        */
+        
     }
 }

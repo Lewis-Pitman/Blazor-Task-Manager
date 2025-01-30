@@ -1,36 +1,40 @@
 ﻿@inject TaskService taskService
 
-<h1 class="title">Dashboard</h1>
-
 <div class="task-stats">
-	<span class="stat-block">
+	<span class="stat-block red">
 		<p>To-do</p>
-		<p>@todoTasks</p>
+		<p class="number">@todoTasks</p>
 	</span>
 
-	<span class="stat-block">
+	<span class="stat-block yellow">
 		<p>In progress</p>
-		<p>@inProgressTasks</p>
+		<p class="number">@inProgressTasks</p>
 	</span>
 
-	<span class="stat-block">
+	<span class="stat-block green">
 		<p>Done</p>
-		<p>@doneTasks</p>
+		<p class="number">@doneTasks</p>
 	</span>
 </div>
 
+<div class="todays-task-block blue">
 @if(todaysTasks != null)
 {
-	foreach(var task in todaysTasks)
+	<div class="todays-task-block blue">
+	<p>Today's tasks:</p>
+	@foreach(var task in todaysTasks)
 	{
 		<p>Title: @task.Title   Description: @task.Description    Status: @task.Status</p>
 		<br />
 	}
+	</div>
 }
 else
 {
+	
 	<p>You have no tasks due today</p>
 }
+</div>
 
 @code {
 	[Parameter]
