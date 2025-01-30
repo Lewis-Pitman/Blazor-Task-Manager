@@ -18,7 +18,6 @@ builder.Services.AddRazorComponents()
 builder.Services.AddServerSideBlazor().AddCircuitOptions(options => options.DetailedErrors = true);
 
 builder.Services.AddDbContextFactory<TabContext>(options => options.UseSqlite(connectionString));
-builder.Services.AddDbContextFactory<TaskContext>(options => options.UseSqlite(connectionString));
 
 builder.Services.AddTransient<TabService>();
 builder.Services.AddTransient<TaskService>();

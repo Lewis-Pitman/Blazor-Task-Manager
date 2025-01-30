@@ -8,17 +8,35 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
 
-namespace BlazorTaskManager.Migrations.Task
+namespace BlazorTaskManager.Migrations
 {
-    [DbContext(typeof(TaskContext))]
-    [Migration("20250127214403_TabId_added_to_TaskItem")]
-    partial class TabId_added_to_TaskItem
+    [DbContext(typeof(TabContext))]
+    [Migration("20250130222051_AddedDueDateToTaskItem")]
+    partial class AddedDueDateToTaskItem
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "9.0.1");
+
+            modelBuilder.Entity("BlazorTaskManager.Models.TabView", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Label")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<bool>("ShowCloseIcon")
+                        .HasColumnType("INTEGER");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Tabs");
+                });
 
             modelBuilder.Entity("BlazorTaskManager.Models.TaskItem", b =>
                 {
@@ -27,18 +45,18 @@ namespace BlazorTaskManager.Migrations.Task
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Description")
-                        .IsRequired()
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Status")
-                        .IsRequired()
                         .HasColumnType("TEXT");
 
                     b.Property<Guid>("TabId")
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Title")
-                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime?>("dueDate")
                         .HasColumnType("TEXT");
 
                     b.HasKey("Id");

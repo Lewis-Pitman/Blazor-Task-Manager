@@ -11,8 +11,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BlazorTaskManager.Migrations
 {
     [DbContext(typeof(TabContext))]
-    [Migration("20250126214950_InitialCreate")]
-    partial class InitialCreate
+    [Migration("20250130221937_DatabaseRework")]
+    partial class DatabaseRework
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -45,37 +45,20 @@ namespace BlazorTaskManager.Migrations
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Description")
-                        .IsRequired()
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Status")
-                        .IsRequired()
                         .HasColumnType("TEXT");
 
-                    b.Property<Guid?>("TabViewId")
+                    b.Property<Guid>("TabId")
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Title")
-                        .IsRequired()
                         .HasColumnType("TEXT");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("TabViewId");
-
                     b.ToTable("TaskItem");
-                });
-
-            modelBuilder.Entity("BlazorTaskManager.Models.TaskItem", b =>
-                {
-                    b.HasOne("BlazorTaskManager.Models.TabView", null)
-                        .WithMany("TaskList")
-                        .HasForeignKey("TabViewId");
-                });
-
-            modelBuilder.Entity("BlazorTaskManager.Models.TabView", b =>
-                {
-                    b.Navigation("TaskList");
                 });
 #pragma warning restore 612, 618
         }

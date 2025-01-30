@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace BlazorTaskManager.Migrations
 {
     /// <inheritdoc />
-    public partial class InitialCreate : Migration
+    public partial class DatabaseRework : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -29,35 +29,25 @@ namespace BlazorTaskManager.Migrations
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "TEXT", nullable: false),
-                    Title = table.Column<string>(type: "TEXT", nullable: false),
-                    Description = table.Column<string>(type: "TEXT", nullable: false),
-                    Status = table.Column<string>(type: "TEXT", nullable: false),
-                    TabViewId = table.Column<Guid>(type: "TEXT", nullable: true)
+                    TabId = table.Column<Guid>(type: "TEXT", nullable: false),
+                    Title = table.Column<string>(type: "TEXT", nullable: true),
+                    Description = table.Column<string>(type: "TEXT", nullable: true),
+                    Status = table.Column<string>(type: "TEXT", nullable: true)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_TaskItem", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_TaskItem_Tabs_TabViewId",
-                        column: x => x.TabViewId,
-                        principalTable: "Tabs",
-                        principalColumn: "Id");
                 });
-
-            migrationBuilder.CreateIndex(
-                name: "IX_TaskItem_TabViewId",
-                table: "TaskItem",
-                column: "TabViewId");
         }
 
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "TaskItem");
+                name: "Tabs");
 
             migrationBuilder.DropTable(
-                name: "Tabs");
+                name: "TaskItem");
         }
     }
 }

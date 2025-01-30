@@ -22,5 +22,6 @@ namespace BlazorTaskManager.Database
         }
 
         public DbSet<TabView> Tabs { get; set; }
+        public DbSet<TaskItem> TaskItem { get; set; }
     }
 }

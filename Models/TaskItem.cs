@@ -11,6 +11,6 @@ namespace BlazorTaskManager.Models
         public string? Title { get; set; }
         public string? Description { get; set; }
         public string? Status { get; set; }
-        //public DateTime? dueDate { get; set; }
+        public DateTime? dueDate { get; set; }
     }
 }
