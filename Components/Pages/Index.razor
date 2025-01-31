@@ -14,16 +14,9 @@
     @switch(CurrentScreen){
         case "Task list":
             <TaskList CurrentTabId="@CurrentTabId" StateHasChanged="@taskListStateHasChanged" />
-
-            <p>Add task:</p>
-            <InputCheckbox @bind-Value="isEditing" />
-            <br />
-
-            if (isEditing)
-            {
-                <AddTask CurrentTabId="@CurrentTabId" OnSubmitClicked="@OnSubmitClicked" />
-                <button @onclick="DeleteAllClicked">Delete all</button>
-            }
+            
+            <AddTask CurrentTabId="@CurrentTabId" OnSubmitClicked="@OnSubmitClicked" />
+            <button @onclick="DeleteAllClicked">Delete all</button>
             break;
 
         case "Kanban":
@@ -36,16 +29,6 @@
         default:
             <Dashboard CurrentTabId="@CurrentTabId" />
             break;
-    }
-}
-else{
-    if(isViewing)
-    {
-        <ViewTask taskItem="@(new TaskItem())" />
-    }
-    else
-    {
-        <EditTask taskItem="@(new TaskItem())" />
     }
 }
 

@@ -104,7 +104,7 @@ namespace BlazorTaskManager.Services
         {
             using (var context = _dbContextFactory.CreateDbContext())
             {
-                return context.TaskItem.Where(item => item.dueDate == dateTime).ToList();
+                return context.TaskItem.Where(item => item.DueDate == dateTime).ToList();
             }
         }
         

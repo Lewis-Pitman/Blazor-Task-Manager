@@ -55,8 +55,7 @@ else
 		inProgressTasks = allTasks.Where(task => task.Status == "In progress").Count();
 		doneTasks = allTasks.Where(task => task.Status == "Done").Count();
 
-		// Migration needs to be done for this to not error
-		//todaysTasks = taskService.GetTaskByDate(DateTime.Today);
+		todaysTasks = taskService.GetTaskByDate(DateTime.Today);
 
 		base.OnParametersSet();
 	}
