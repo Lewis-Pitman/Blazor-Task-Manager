@@ -1,11 +1,33 @@
 ﻿@inject TaskService taskService
 
-<h1>TaskList</h1>
+<MudDataGrid T="TaskItem" @ref="dataGrid" MultiSelection="true" Items="@allTasks" SortMode="SortMode.Multiple" Filterable="true" QuickFilter="@_quickFilter"
+RowClick="@RowClicked" RowContextMenuClick="RowRightClicked" SelectedItemsChanged="@SelectedItemsChanged"
+Style="background-color: transparent; margin-top: 10px;">
+    <ToolBarContent>
+        <MudText Typo="Typo.h6">Task List</MudText>
+        <MudSpacer />
 
-@foreach(var task in allTasks){
-    <p>Title: @task.Title   Description: @task.Description    Status: @task.Status     Due date: @task.DueDate</p>
-    <br />
-}
+        <!-- Search bar -->
+        <MudTextField Label="Title, description and status" @bind-Value="_searchString" Placeholder="Search" Adornment="Adornment.Start" Immediate="true"
+        AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0" />
+
+        <MudSpacer />
+
+        <!-- Date search bar -->
+        <MudDatePicker Label="Due date" @bind-Date="_searchDate" Editable="true" ImmediateText="true" 
+        Placeholder="Day / Month / Year" DateFormat="dd.MM.yyyy" Clearable="true" />
+    </ToolBarContent>
+    <Columns>
+        <SelectColumn T="TaskItem" />
+        <PropertyColumn Property="task => task.Title" Title="Title" />
+        <PropertyColumn Property="task => task.Description" Title="Description" />
+        <PropertyColumn Property="task => task.DueDate" Title="Due date" />
+        <PropertyColumn Property="task => task.Status" Title="Status" />
+    </Columns>
+    <PagerContent>
+        <MudDataGridPager T="TaskItem" />
+    </PagerContent>
+</MudDataGrid>
 
 @code {
     [Parameter]
@@ -14,7 +36,9 @@
     [Parameter]
     public bool StateHasChanged { get; set; }
 
-    private List<TaskItem> allTasks;
+    private MudDataGrid<TaskItem> dataGrid;
+
+    private IEnumerable<TaskItem> allTasks;
 
     protected override void OnParametersSet()
     {
@@ -22,5 +46,63 @@
         StateHasChanged = false;
 
         base.OnParametersSet();
+    }
+
+
+    // Data grid (Mudblazor):
+    // https://mudblazor.com/components/datagrid#advanced-data-grid
+
+    private List<string> _events = new();
+
+    private string _searchString;
+
+    private DateTime? _searchDate;
+
+    public DateTime? SearchDate 
+    {
+        get { return _searchDate; }
+        set 
+        {
+            _searchDate = value;
+            //ApplyDateFilter();
+        }
+    }
+
+    // Quick filter - filter globally across multiple columns with the same input
+    private Func<TaskItem, bool> _quickFilter => task =>
+    {
+        // If nothing is searched, all items can be returned
+        if (string.IsNullOrWhiteSpace(_searchString))
+            return true;
+
+        // If something is searched, and the task's title or description contains the search term, return it
+        if (task.Title.Contains(_searchString, StringComparison.OrdinalIgnoreCase))
+            return true;
+
+        if (task.Description.Contains(_searchString, StringComparison.OrdinalIgnoreCase))
+            return true;
+
+        // If the task's due date matches the one searched, return it
+        if (task.DueDate == _searchDate)
+            return true;
+
+        // If above checks failed, the task is not in the search results, so return false for that task
+        return false;
+    };
+
+    // Events
+    void RowClicked(DataGridRowClickEventArgs<TaskItem> args)
+    {
+        _events.Insert(0, $"Event = RowClick, Index = {args.RowIndex}, Data = {System.Text.Json.JsonSerializer.Serialize(args.Item)}");
+    }
+
+    void RowRightClicked(DataGridRowClickEventArgs<TaskItem> args)
+    {
+        _events.Insert(0, $"Event = RowRightClick, Index = {args.RowIndex}, Data = {System.Text.Json.JsonSerializer.Serialize(args.Item)}");
+    }
+
+    void SelectedItemsChanged(HashSet<TaskItem> items)
+    {
+        _events.Insert(0, $"Event = SelectedItemsChanged, Data = {System.Text.Json.JsonSerializer.Serialize(items)}");
     }
 }

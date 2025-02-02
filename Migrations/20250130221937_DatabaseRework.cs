@@ -21,7 +21,7 @@ namespace BlazorTaskManager.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Tabs", x => x.Id);
+                    table.PrimaryKey("PK_Tabs", task => task.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -36,7 +36,7 @@ namespace BlazorTaskManager.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_TaskItem", x => x.Id);
+                    table.PrimaryKey("PK_TaskItem", task => task.Id);
                 });
         }
 

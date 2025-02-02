@@ -100,11 +100,11 @@ namespace BlazorTaskManager.Services
         }
 
         
-        public List<TaskItem> GetTaskByDate(DateTime dateTime)
+        public List<TaskItem> GetTaskByDate(DateTime dateTime, Guid tabId)
         {
             using (var context = _dbContextFactory.CreateDbContext())
             {
-                return context.TaskItem.Where(item => item.DueDate == dateTime).ToList();
+                return context.TaskItem.Where(item => item.DueDate == dateTime && item.TabId == tabId).ToList();
             }
         }
         

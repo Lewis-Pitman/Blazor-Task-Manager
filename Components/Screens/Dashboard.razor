@@ -18,22 +18,19 @@
 </div>
 
 <div class="todays-task-block blue">
-@if(todaysTasks != null)
-{
-	<div class="todays-task-block blue">
 	<p>Today's tasks:</p>
-	@foreach(var task in todaysTasks)
+
+	@if(todaysTasks?.Count != 0)
 	{
-		<p>Title: @task.Title   Description: @task.Description    Status: @task.Status</p>
-		<br />
+		@foreach(var task in todaysTasks)
+		{
+			<p>Title: @task.Title   Description: @task.Description    Status: @task.Status</p>
+		}
 	}
-	</div>
-}
-else
-{
-	
-	<p>You have no tasks due today</p>
-}
+	else
+	{
+		<p>You have no tasks due today</p>
+	}
 </div>
 
 @code {
@@ -55,7 +52,7 @@ else
 		inProgressTasks = allTasks.Where(task => task.Status == "In progress").Count();
 		doneTasks = allTasks.Where(task => task.Status == "Done").Count();
 
-		todaysTasks = taskService.GetTaskByDate(DateTime.Today);
+		todaysTasks = taskService.GetTaskByDate(DateTime.Today, CurrentTabId);
 
 		base.OnParametersSet();
 	}
