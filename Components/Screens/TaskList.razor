@@ -58,19 +58,14 @@ Style="background-color: transparent; margin-top: 10px;">
 
     private DateTime? _searchDate;
 
-    public DateTime? SearchDate 
-    {
-        get { return _searchDate; }
-        set 
-        {
-            _searchDate = value;
-            //ApplyDateFilter();
-        }
-    }
-
     // Quick filter - filter globally across multiple columns with the same input
     private Func<TaskItem, bool> _quickFilter => task =>
     {
+
+        // If the task's due date matches the one searched, return it
+        if (_searchDate != null && task.DueDate != _searchDate)
+            return false;
+
         // If nothing is searched, all items can be returned
         if (string.IsNullOrWhiteSpace(_searchString))
             return true;
@@ -80,10 +75,6 @@ Style="background-color: transparent; margin-top: 10px;">
             return true;
 
         if (task.Description.Contains(_searchString, StringComparison.OrdinalIgnoreCase))
-            return true;
-
-        // If the task's due date matches the one searched, return it
-        if (task.DueDate == _searchDate)
             return true;
 
         // If above checks failed, the task is not in the search results, so return false for that task
