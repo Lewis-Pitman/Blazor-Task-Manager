@@ -1,27 +1,44 @@
 ﻿@inject TaskService taskService
 
 <MudDataGrid T="TaskItem" @ref="dataGrid" MultiSelection="true" Items="@allTasks" SortMode="SortMode.Multiple" Filterable="true" QuickFilter="@_quickFilter"
-RowClick="@RowClicked" RowContextMenuClick="RowRightClicked" SelectedItemsChanged="@SelectedItemsChanged"
+RowClick="@RowClicked" SelectedItemsChanged="@SelectedItemsChanged" Elevation="0"
 Style="background-color: transparent; margin-top: 10px;">
     <ToolBarContent>
-        <MudText Typo="Typo.h6">Task List</MudText>
+        <MudPaper Class="black">
+            <MudText Typo="Typo.h6">Task List</MudText>
+        </MudPaper>
+
         <MudSpacer />
 
         <!-- Search bar -->
-        <MudTextField Label="Title, description and status" @bind-Value="_searchString" Placeholder="Search" Adornment="Adornment.Start" Immediate="true"
-        AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0" />
-
+        <MudPaper Class="black">
+            <MudTextField @bind-Value="_searchString" Placeholder="Titles and descriptions" Adornment="Adornment.Start" Immediate="true"
+            AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" />
+        </MudPaper>
         <MudSpacer />
 
         <!-- Date search bar -->
-        <MudDatePicker Label="Due date" @bind-Date="_searchDate" Editable="true" ImmediateText="true" 
-        Placeholder="Day / Month / Year" DateFormat="dd.MM.yyyy" Clearable="true" />
+        <MudPaper Class="black">
+            <MudDatePicker @bind-Date="_searchDate" Editable="true" ImmediateText="true" 
+            Placeholder="Day / Month / Year" DateFormat="dd.MM.yyyy" Clearable="true" />
+        </MudPaper>
+        <MudSpacer />
+
+        <!-- Status dropdown -->
+        <MudPaper Class="black">
+            <MudSelect @bind-Value="_searchStatus" Placeholder="Status" Clearable="true">
+                <MudSelectItem Value="@("To-do")">To-do</MudSelectItem>
+                <MudSelectItem Value="@("In progress")">In progress</MudSelectItem>
+                <MudSelectItem Value="@("Done")">Done</MudSelectItem>
+            </MudSelect>
+        </MudPaper>
+
     </ToolBarContent>
     <Columns>
         <SelectColumn T="TaskItem" />
         <PropertyColumn Property="task => task.Title" Title="Title" Filterable="false" />
         <PropertyColumn Property="task => task.Description" Title="Description" Filterable="false" />
-        <PropertyColumn Property="task => task.DueDate" Title="Due date" Filterable="false" />
+        <PropertyColumn Property="task => task.DueDate.ToString().Substring(0, 10)" Title="Due date" Filterable="false" />
         <PropertyColumn Property="task => task.Status" Title="Status" Filterable="false" />
     </Columns>
     <PagerContent>
@@ -52,19 +69,26 @@ Style="background-color: transparent; margin-top: 10px;">
     // Data grid (Mudblazor):
     // https://mudblazor.com/components/datagrid#advanced-data-grid
 
-    private List<string> _events = new();
+    private List<TaskItem> _selectedTasks = new();
 
     private string _searchString;
-
     private DateTime? _searchDate;
+    private string? _searchStatus;
 
     // Quick filter - filter globally across multiple columns with the same input
     private Func<TaskItem, bool> _quickFilter => task =>
     {
 
-        // If the task's due date matches the one searched, return it
+        // If date search is empty, move to next checks, otherwise check to see if it is equal.
         if (_searchDate != null && task.DueDate != _searchDate)
             return false;
+
+        // Status
+        if (_searchStatus != null && task.Status != _searchStatus)
+            return false;
+
+        // Returning false if conditions are met above allows us to filter down further, rather than
+        // ignoring whats in the other filters
 
         // If nothing is searched, all items can be returned
         if (string.IsNullOrWhiteSpace(_searchString))
@@ -84,16 +108,11 @@ Style="background-color: transparent; margin-top: 10px;">
     // Events
     void RowClicked(DataGridRowClickEventArgs<TaskItem> args)
     {
-        _events.Insert(0, $"Event = RowClick, Index = {args.RowIndex}, Data = {System.Text.Json.JsonSerializer.Serialize(args.Item)}");
-    }
-
-    void RowRightClicked(DataGridRowClickEventArgs<TaskItem> args)
-    {
-        _events.Insert(0, $"Event = RowRightClick, Index = {args.RowIndex}, Data = {System.Text.Json.JsonSerializer.Serialize(args.Item)}");
+        //TaskView popover
     }
 
     void SelectedItemsChanged(HashSet<TaskItem> items)
     {
-        _events.Insert(0, $"Event = SelectedItemsChanged, Data = {System.Text.Json.JsonSerializer.Serialize(items)}");
+        _selectedTasks = items.ToList();
     }
 }
