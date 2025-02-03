@@ -19,10 +19,10 @@ Style="background-color: transparent; margin-top: 10px;">
     </ToolBarContent>
     <Columns>
         <SelectColumn T="TaskItem" />
-        <PropertyColumn Property="task => task.Title" Title="Title" />
-        <PropertyColumn Property="task => task.Description" Title="Description" />
-        <PropertyColumn Property="task => task.DueDate" Title="Due date" />
-        <PropertyColumn Property="task => task.Status" Title="Status" />
+        <PropertyColumn Property="task => task.Title" Title="Title" Filterable="false" />
+        <PropertyColumn Property="task => task.Description" Title="Description" Filterable="false" />
+        <PropertyColumn Property="task => task.DueDate" Title="Due date" Filterable="false" />
+        <PropertyColumn Property="task => task.Status" Title="Status" Filterable="false" />
     </Columns>
     <PagerContent>
         <MudDataGridPager T="TaskItem" />
@@ -64,7 +64,20 @@ Style="background-color: transparent; margin-top: 10px;">
         set 
         {
             _searchDate = value;
-            //ApplyDateFilter();
+            ApplyDateFilter();
+            dataGrid.ReloadServerData();
+        }
+    }
+
+    private void ApplyDateFilter()
+    {
+        if (_searchDate != null)
+        {
+            allTasks = allTasks.Where(task => task.DueDate == _searchDate);
+        }
+        else
+        {
+            allTasks = taskService.GetAllTasksWithTabId(CurrentTabId);
         }
     }
 
