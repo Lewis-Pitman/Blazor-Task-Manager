@@ -1,14 +1,15 @@
 ﻿@inject TaskService taskService
 @inject IModalService Modal
+@rendermode InteractiveServer
 
 @if (isViewing)
 {
     <EditTask taskItem="@selectedTask" />
 }
 
-<MudDataGrid T="TaskItem" @ref="dataGrid" MultiSelection="true" Items="@allTasks" SortMode="SortMode.Multiple" Filterable="true" QuickFilter="@_quickFilter"
-RowClick="@RowClicked" SelectedItemsChanged="@SelectedItemsChanged" Elevation="0"
-Style="background-color: transparent; margin-top: 10px;">
+<MudDataGrid T="TaskItem" @ref="dataGrid" Items="@allTasks" SortMode="SortMode.Multiple" Filterable="true" QuickFilter="@_quickFilter"
+             RowClick="@RowClicked" SelectedItemsChanged="@SelectedItemsChanged" Elevation="0" Style="background-color: transparent; margin-top: 10px;"
+             HeaderClass="blue" Striped="true">
     <ToolBarContent>
         <MudPaper Class="black">
             <MudText Typo="Typo.h6">Task List</MudText>
@@ -51,7 +52,6 @@ Style="background-color: transparent; margin-top: 10px;">
         <MudDataGridPager T="TaskItem" />
     </PagerContent>
 </MudDataGrid>
-
 
 @code {
     [Parameter]
@@ -118,7 +118,12 @@ Style="background-color: transparent; margin-top: 10px;">
     // Events
     void RowClicked(DataGridRowClickEventArgs<TaskItem> args)
     {
-        Modal.Show<EditTask>();
+        var parameters = new ModalParameters();
+        parameters.Add(nameof(EditTask.taskItem), args.Item);
+
+        var options = new ModalOptions {  Size = ModalSize.Medium };
+
+        Modal.Show<EditTask>("Test", parameters, options);
     }
 
     void SelectedItemsChanged(HashSet<TaskItem> items)
