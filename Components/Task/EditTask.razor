@@ -6,32 +6,26 @@
 
 @if (isEditing)
 {
-    <div class="main-content">
         <EditForm Model="@taskItem" OnValidSubmit="HandleSubmit">
             <input type="text" placeholder="title" @bind-value="@taskItem.Title"/>
             <input type="text" placeholder="description" @bind-value="@taskItem.Description"/>
             <input type="text" placeholder="status" @bind-value="@taskItem.Status"/>
             <button type="submit">Submit</button>
         </EditForm>
-    </div>
 }
 else
 {
-    <div class="main-content">
         <p>Title: @taskItem.Title, Description: @taskItem.Description, Status: @taskItem.Status, Due: @taskItem.DueDate</p>
         <br />
         <p>Edit:</p>
-    </div>
 }
 
-<div class="overlay" />
 
 @code {
     [Parameter]
     public EventCallback OnSubmitClicked { get; set; }
 
-    [Parameter] 
-    public TaskItem taskItem { get; set; }
+    public TaskItem taskItem { get; set; } = new TaskItem();
 
     private bool isEditing = false;
 

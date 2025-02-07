@@ -1,4 +1,5 @@
 ﻿@inject TaskService taskService
+@inject IModalService Modal
 
 @if (isViewing)
 {
@@ -117,8 +118,7 @@ Style="background-color: transparent; margin-top: 10px;">
     // Events
     void RowClicked(DataGridRowClickEventArgs<TaskItem> args)
     {
-        selectedTask = args.Item;
-        isViewing = true;
+        Modal.Show<EditTask>();
     }
 
     void SelectedItemsChanged(HashSet<TaskItem> items)
