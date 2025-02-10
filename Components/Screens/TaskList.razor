@@ -7,6 +7,18 @@
     <EditTask taskItem="@selectedTask" />
 }
 
+<!-- Toolbar -->
+<div class="black toolbar">
+    <div />
+    <!-- Replace above div with datagrid search!? -->
+    <div class="toolbar-items">
+        <MudIconButton Icon="@Icons.Material.Filled.Delete" aria-label="delete" Color="Color.Warning" OnClick="OnDeleteClicked"/>
+        <MudIconButton Icon="@Icons.Material.Filled.Edit" aria-label="edit status" Color="Color.Primary" OnClick="OnEditStatusClicked"/>
+        <MudIconButton Icon="@Icons.Material.Filled.Add" aria-label="add new" Color="Color.Primary" OnClick="OnAddClicked"/>
+    </div>
+</div>
+
+<!-- Grid -->
 <MudDataGrid T="TaskItem" @ref="dataGrid" Items="@allTasks" SortMode="SortMode.Multiple" Filterable="true" QuickFilter="@_quickFilter"
              RowClick="@RowClicked" SelectedItemsChanged="@SelectedItemsChanged" Elevation="0" Style="background-color: transparent; margin-top: 10px;"
              HeaderClass="blue" Striped="true">
@@ -20,14 +32,14 @@
         <!-- Search bar -->
         <MudPaper Class="black">
             <MudTextField @bind-Value="_searchString" Placeholder="Titles and descriptions" Adornment="Adornment.Start" Immediate="true"
-            AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" />
+                          AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" />
         </MudPaper>
         <MudSpacer />
 
         <!-- Date search bar -->
         <MudPaper Class="black">
             <MudDatePicker @bind-Date="_searchDate" Editable="true" ImmediateText="true" 
-            Placeholder="Day / Month / Year" DateFormat="dd.MM.yyyy" Clearable="true" />
+                           Placeholder="Day / Month / Year" DateFormat="dd.MM.yyyy" Clearable="true" />
         </MudPaper>
         <MudSpacer />
 
@@ -53,6 +65,16 @@
     </PagerContent>
 </MudDataGrid>
 
+<!-- Message popups -->
+<MudMessageBox @ref="confirmDeleteMessage" Title="Warning" CancelText="Cancel">
+    <MessageContent>
+        This action will <b>delete all currently selected tasks.</b> this <b>cannot</b> be undone.
+    </MessageContent>
+    <YesButton>
+        <MudButton Variant="Variant.Filled" Color="Color.Error" StartIcon="@Icons.Material.Filled.DeleteForever">Delete</MudButton>
+    </YesButton>
+</MudMessageBox>
+
 @code {
     [Parameter]
     public Guid CurrentTabId { get; set; }
@@ -74,8 +96,7 @@
 
         base.OnParametersSet();
     }
-
-
+    
     // Data grid (Mudblazor):
     // https://mudblazor.com/components/datagrid#advanced-data-grid
 
@@ -129,5 +150,43 @@
     void SelectedItemsChanged(HashSet<TaskItem> items)
     {
         _selectedTasks = items.ToList();
+    }
+    
+    // Toolbar buttons:
+    private MudMessageBox confirmDeleteMessage;
+
+    private void OnEditStatusClicked()
+    {
+        // Modal.Show<EditStatus>();
+        // ^^^ Add this component w/ styling
+    }
+
+    private void OnAddClicked()
+    {
+        Modal.Show<AddTask>();
+    }
+
+    private async void OnDeleteClicked()
+    {
+        bool? confirmDelete = await DeletePopupAsync();
+
+        if (confirmDelete == true)
+        {
+            foreach (var task in _selectedTasks)
+            {
+                taskService.RemoveTask(task);
+            }
+
+            allTasks = taskService.GetAllTasksWithTabId(CurrentTabId);
+        }
+    }
+    
+    private async Task<bool?> DeletePopupAsync()
+    {
+        bool? result = await confirmDeleteMessage.ShowAsync();
+        result = result == null ? false : true;
+        StateHasChanged();
+
+        return result;
     }
 }
