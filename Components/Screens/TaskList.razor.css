@@ -2,16 +2,16 @@
     text-align: center;
 }
 
-.toolbar{
-    height: 15% !important;
-    display: grid;
-    grid-template-columns: 3fr 1fr;
-}
-
-.toolbar-items{
+.toolbar-utility{
     display: grid;
     grid-template-columns: 1fr 1fr 1fr;
     align-items: center;
+}
+
+.pager {
+    background-color: black !important;
+    bottom: 0px !important;
+    width: 100% !important;
 }
 
 .black{

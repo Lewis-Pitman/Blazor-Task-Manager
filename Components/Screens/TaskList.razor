@@ -2,26 +2,10 @@
 @inject IModalService Modal
 @rendermode InteractiveServer
 
-@if (isViewing)
-{
-    <EditTask taskItem="@selectedTask" />
-}
-
-<!-- Toolbar -->
-<div class="black toolbar">
-    <div />
-    <!-- Replace above div with datagrid search!? -->
-    <div class="toolbar-items">
-        <MudIconButton Icon="@Icons.Material.Filled.Delete" aria-label="delete" Color="Color.Warning" OnClick="OnDeleteClicked"/>
-        <MudIconButton Icon="@Icons.Material.Filled.Edit" aria-label="edit status" Color="Color.Primary" OnClick="OnEditStatusClicked"/>
-        <MudIconButton Icon="@Icons.Material.Filled.Add" aria-label="add new" Color="Color.Primary" OnClick="OnAddClicked"/>
-    </div>
-</div>
-
 <!-- Grid -->
-<MudDataGrid T="TaskItem" @ref="dataGrid" Items="@allTasks" SortMode="SortMode.Multiple" Filterable="true" QuickFilter="@_quickFilter"
-             RowClick="@RowClicked" SelectedItemsChanged="@SelectedItemsChanged" Elevation="0" Style="background-color: transparent; margin-top: 10px;"
-             HeaderClass="blue" Striped="true">
+<MudDataGrid T="TaskItem" @ref="dataGrid" Items="@allTasks" MultiSelection="true" SortMode="SortMode.Multiple" Filterable="true" QuickFilter="@_quickFilter"
+RowClick="@RowClicked" SelectedItemsChanged="@SelectedItemsChanged" Elevation="0" Style="position: relative; top: 0px; height: 100%; width: 100%;"
+HeaderClass="blue" RowStyleFunc="RowStyleFunc">
     <ToolBarContent>
         <MudPaper Class="black">
             <MudText Typo="Typo.h6">Task List</MudText>
@@ -32,14 +16,14 @@
         <!-- Search bar -->
         <MudPaper Class="black">
             <MudTextField @bind-Value="_searchString" Placeholder="Titles and descriptions" Adornment="Adornment.Start" Immediate="true"
-                          AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" />
+            AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" />
         </MudPaper>
         <MudSpacer />
 
         <!-- Date search bar -->
         <MudPaper Class="black">
             <MudDatePicker @bind-Date="_searchDate" Editable="true" ImmediateText="true" 
-                           Placeholder="Day / Month / Year" DateFormat="dd.MM.yyyy" Clearable="true" />
+            Placeholder="Day / Month / Year" DateFormat="dd.MM.yyyy" Clearable="true" />
         </MudPaper>
         <MudSpacer />
 
@@ -51,6 +35,14 @@
                 <MudSelectItem Value="@("Done")">Done</MudSelectItem>
             </MudSelect>
         </MudPaper>
+        <MudSpacer />
+
+        <!-- Utility buttons -->
+        <MudPaper Class="toolbar-utility">
+            <MudIconButton Icon="@Icons.Material.Filled.Delete" aria-label="delete" Color="Color.Warning" OnClick="OnDeleteClicked" />
+            <MudIconButton Icon="@Icons.Material.Filled.Edit" aria-label="edit status" Color="Color.Primary" OnClick="OnEditStatusClicked" />
+            <MudIconButton Icon="@Icons.Material.Filled.Add" aria-label="add new" Color="Color.Primary" OnClick="OnAddClicked" />
+        </MudPaper>
 
     </ToolBarContent>
     <Columns>
@@ -61,7 +53,11 @@
         <PropertyColumn Property="task => task.Status" Title="Status" Filterable="false" />
     </Columns>
     <PagerContent>
-        <MudDataGridPager T="TaskItem" />
+        <!-- CSS classes don't function correctly when working with this element, so style is used instead -->
+        <MudDataGridPager T="TaskItem" Style="position: fixed !important; 
+                                       bottom: 0px !important; 
+                                       width: 100% !important;
+                                       background-color: black !important;" />
     </PagerContent>
 </MudDataGrid>
 
@@ -96,7 +92,7 @@
 
         base.OnParametersSet();
     }
-    
+
     // Data grid (Mudblazor):
     // https://mudblazor.com/components/datagrid#advanced-data-grid
 
@@ -151,7 +147,7 @@
     {
         _selectedTasks = items.ToList();
     }
-    
+
     // Toolbar buttons:
     private MudMessageBox confirmDeleteMessage;
 
@@ -180,7 +176,7 @@
             allTasks = taskService.GetAllTasksWithTabId(CurrentTabId);
         }
     }
-    
+
     private async Task<bool?> DeletePopupAsync()
     {
         bool? result = await confirmDeleteMessage.ShowAsync();
@@ -188,5 +184,20 @@
         StateHasChanged();
 
         return result;
+    }
+
+    // Datagrid rows
+    private string RowStyleFunc(TaskItem arg, int index)
+    {
+        switch (arg.Status)
+        {
+            case "To-do":
+                return "Background-color: rgba(240, 51, 57, 0.5);";
+            case "In progress":
+                return "Background-color: rgba(240, 240, 51, 0.5);";
+            default:
+                return "Background-color: rgba(51, 240, 95, 0.5);";
+
+        }
     }
 }

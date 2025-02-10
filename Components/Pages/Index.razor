@@ -9,30 +9,23 @@
 <ControlHeader OnScreenChange="SetScreen" OnDarkModeToggle="ToggleDarkMode" OnActiveTabChange="SetCurrentTab" />
 
 <!-- Screens -->
-@if(!isEditing && !isViewing)
-{
-    @switch(CurrentScreen){
-        case "Task list":
-            <TaskList CurrentTabId="@CurrentTabId" StateHasChanged="@taskListStateHasChanged" />
-            
-            <AddTask CurrentTabId="@CurrentTabId" OnSubmitClicked="@OnSubmitClicked" />
-            <button @onclick="DeleteAllClicked">Delete all</button>
-            break;
+@switch(CurrentScreen){
+    case "Task list":
+        <TaskList CurrentTabId="@CurrentTabId" StateHasChanged="@taskListStateHasChanged" />
+        break;
 
-        case "Kanban":
-            <Kanban />
+    case "Kanban":
+        <Kanban />
 
-            <!-- Temporary element below to test viewing a task -->
-            <ViewTask taskItem="@(new TaskItem{Title = "View test", Description = "This is a description", Status = "To-do" })" />
-            break;
+        <!-- Temporary element below to test viewing a task -->
+        <ViewTask taskItem="@(new TaskItem{Title = "View test", Description = "This is a description", Status = "To-do" })" />
+        break;
 
-        default:
-            <Dashboard CurrentTabId="@CurrentTabId" />
-            break;
-    }
+    default:
+        <Dashboard CurrentTabId="@CurrentTabId" />
+        break;
 }
 
-<p>isViewing:</p> <InputCheckbox @bind-Value="@isViewing" />
 
 @code {
     private Guid CurrentTabId { get; set; }
@@ -40,24 +33,10 @@
     private string CurrentScreen { get; set; }
     private bool IsDarkMode { get; set; }
 
-    // Temporary..?
-    private bool isEditing;
-    private bool isViewing;
-
     private bool taskListStateHasChanged;
 
     private void OnSubmitClicked(){
         taskListStateHasChanged = true;
-    }
-
-    private void DeleteAllClicked()
-    {
-        var allTabs = tabService.GetAllTabs();
-
-        foreach(var tab in allTabs){
-            taskService.RemoveAllTasksWithTabId(tab.Id);
-            tabService.RemoveTab(tab);
-        }
     }
 
     private void SetCurrentTab(Guid currentTabId){
