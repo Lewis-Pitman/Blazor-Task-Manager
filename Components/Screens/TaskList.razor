@@ -189,15 +189,13 @@ HeaderClass="blue" RowStyleFunc="RowStyleFunc">
     // Datagrid rows
     private string RowStyleFunc(TaskItem arg, int index)
     {
-        switch (arg.Status)
-        {
-            case "To-do":
-                return "Background-color: rgba(240, 51, 57, 0.5);";
-            case "In progress":
-                return "Background-color: rgba(240, 240, 51, 0.5);";
-            default:
-                return "Background-color: rgba(51, 240, 95, 0.5);";
+        // Hacky solution to styling problems
+        // Datagrid does have built-in row stripes, but these would be black due to background colour needing
+        // to be black to have the black toolbar
 
-        }
+        string lighterStripe = "background-color: #2d2d2d;";
+        string darkerStripe = "background-color: #535353;";
+
+        return index % 2 == 0 ? lighterStripe : darkerStripe;
     }
 }
