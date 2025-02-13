@@ -40,7 +40,9 @@ HeaderClass="blue" RowStyleFunc="RowStyleFunc">
         <!-- Utility buttons -->
         <MudPaper Class="toolbar-utility">
             <MudIconButton Icon="@Icons.Material.Filled.Delete" aria-label="delete" Color="Color.Warning" OnClick="OnDeleteClicked" />
-            <MudIconButton Icon="@Icons.Material.Filled.Edit" aria-label="edit status" Color="Color.Primary" OnClick="OnEditStatusClicked" />
+            <MudIconButton Icon="@Icons.Material.Filled.HourglassEmpty" aria-label="change status to to-do" Color="Color.Primary" OnClick="@(() => OnEditStatusClicked("To-do"))" />
+            <MudIconButton Icon="@Icons.Material.Filled.HourglassBottom" aria-label="change status to in progress" Color="Color.Primary" OnClick="@(() => OnEditStatusClicked("In progress"))" />
+            <MudIconButton Icon="@Icons.Material.Filled.Done" aria-label="change status to done" Color="Color.Primary" OnClick="@(() => OnEditStatusClicked("Done"))" />
             <MudIconButton Icon="@Icons.Material.Filled.Add" aria-label="add new" Color="Color.Primary" OnClick="OnAddClicked" />
         </MudPaper>
 
@@ -68,6 +70,15 @@ HeaderClass="blue" RowStyleFunc="RowStyleFunc">
     </MessageContent>
     <YesButton>
         <MudButton Variant="Variant.Filled" Color="Color.Error" StartIcon="@Icons.Material.Filled.DeleteForever">Delete</MudButton>
+    </YesButton>
+</MudMessageBox>
+
+<MudMessageBox @ref="confirmEditStatusMessage" Title="Edit status" CancelText="Cancel">
+    <MessageContent>
+        This action will change the status of <b> all selected tasks </b> to <b> @selectedStatus</b>. Are you sure?
+    </MessageContent>
+    <YesButton>
+        <MudButton Variant="Variant.Filled" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Done">Confirm</MudButton>
     </YesButton>
 </MudMessageBox>
 
@@ -151,10 +162,23 @@ HeaderClass="blue" RowStyleFunc="RowStyleFunc">
     // Toolbar buttons:
     private MudMessageBox confirmDeleteMessage;
 
-    private void OnEditStatusClicked()
+    private MudMessageBox confirmEditStatusMessage;
+    string selectedStatus = "To-do";
+
+    private async void OnEditStatusClicked(string statusType)
     {
-        // Modal.Show<EditStatus>();
-        // ^^^ Add this component w/ styling
+        selectedStatus = statusType;
+        bool? confirmEdit = await EditStatusPopupAsync();
+
+        if(confirmEdit == true)
+        {
+            foreach(var task in _selectedTasks)
+            {
+                task.Status = statusType;
+                taskService.EditTask(task.Id, task);
+            }
+        }
+
     }
 
     private void OnAddClicked()
@@ -180,6 +204,15 @@ HeaderClass="blue" RowStyleFunc="RowStyleFunc">
     private async Task<bool?> DeletePopupAsync()
     {
         bool? result = await confirmDeleteMessage.ShowAsync();
+        result = result == null ? false : true;
+        StateHasChanged();
+
+        return result;
+    }
+
+    private async Task<bool?> EditStatusPopupAsync()
+    {
+        bool? result = await confirmEditStatusMessage.ShowAsync();
         result = result == null ? false : true;
         StateHasChanged();
 

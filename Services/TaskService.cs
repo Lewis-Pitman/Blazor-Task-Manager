@@ -51,7 +51,7 @@ namespace BlazorTaskManager.Services
                     existingTask.Title = task.Title;
                     existingTask.Description = task.Description;
                     existingTask.Status = task.Status;
-                    // Add due date
+                    existingTask.DueDate = task.DueDate;
 
                     context.SaveChanges();
                 }
