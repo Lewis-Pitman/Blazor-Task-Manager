@@ -183,7 +183,12 @@ HeaderClass="blue" RowStyleFunc="RowStyleFunc">
 
     private void OnAddClicked()
     {
-        Modal.Show<AddTask>();
+        var options = new ModalOptions()
+        {
+            Class = "modal"
+        };
+        
+        Modal.Show<AddTask>(options);
     }
 
     private async void OnDeleteClicked()

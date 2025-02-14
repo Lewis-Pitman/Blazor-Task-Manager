@@ -1,5 +1,73 @@
-﻿<h3>Kanban</h3>
+﻿@inject TaskService taskService
+
+<!-- https://mudblazor.com/components/dropzone#miscellaneous-kanban -->
+
+<MudDropContainer T="TaskItem" @ref="_dropContainer" Items="@_tasks" ItemsSelector="@((item,column) => item.Status == column)" ItemDropped="TaskUpdated" Class="d-flex flex-row">
+	<ChildContent>
+		@foreach (var item in _sections)
+		{
+			<MudPaper Elevation="0" Width="224px" MinHeight="400px" Class="pa-4 ma-4 d-flex flex-column mud-background-gray rounded-lg">
+				<MudToolBar Gutters="false">
+					<MudText Typo="Typo.subtitle1"><b>@item.Name</b></MudText>
+					<MudSpacer />
+				</MudToolBar>
+				<MudDropZone T="TaskItem" Identifier="@item.Name" Class="mud-height-full" />
+
+				<MudButton OnClick="@(() => item.NewTaskOpen = !item.NewTaskOpen)" StartIcon="@Icons.Material.Filled.Add" FullWidth="true" Class="rounded-lg py-2">Add Task</MudButton>
+				
+			</MudPaper>
+		}
+	</ChildContent>
+	<ItemRenderer>
+		<MudPaper Elevation="25" Class="pa-4 rounded-lg my-3">@context.Title</MudPaper>
+	</ItemRenderer>
+</MudDropContainer>
 
 @code {
+	[Parameter]
+	public Guid CurrentTabId { get; set; }
+	
+	private MudDropContainer<TaskItem> _dropContainer;
+	
+	private List<TaskItem> _tasks;
+
+	protected override void OnInitialized()
+	{
+		_tasks = taskService.GetAllTasksWithTabId(CurrentTabId);
+	}
+
+	private bool _addSectionOpen;
+	/* handling board events */
+	private void TaskUpdated(MudItemDropInfo<TaskItem> info)
+	{
+		info.Item.Status = info.DropzoneIdentifier;
+	}
+
+	/* Setup for board  */
+	private List<KanBanSections> _sections = new()
+		{
+			new KanBanSections("To-do", false, String.Empty),
+			new KanBanSections("In progress", false, String.Empty),
+			new KanBanSections("Done", false, String.Empty),
+		};
+
+	public class KanBanSections
+	{
+		public string Name { get; init; }
+		public bool NewTaskOpen { get; set; }
+		public string NewTaskName { get; set; }
+
+		public KanBanSections(string name, bool newTaskOpen, string newTaskName)
+		{
+			Name = name;
+			NewTaskOpen = newTaskOpen;
+			NewTaskName = newTaskName;
+		}
+	}
+
+	private void AddTask()
+	{
+		
+	}
 
 }

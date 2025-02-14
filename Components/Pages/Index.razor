@@ -15,10 +15,7 @@
         break;
 
     case "Kanban":
-        <Kanban />
-
-        <!-- Temporary element below to test viewing a task -->
-        <ViewTask taskItem="@(new TaskItem{Title = "View test", Description = "This is a description", Status = "To-do" })" />
+        <Kanban CurrentTabId="@CurrentTabId" />
         break;
 
     default:
