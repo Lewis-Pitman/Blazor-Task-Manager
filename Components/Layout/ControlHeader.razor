@@ -26,17 +26,8 @@
 
     </MudDynamicTabs>
 
-    <!-- Dark/light toggle & screen select -->
-    <div class="header-options">
-        <MudSwitch 
-        @bind-Value="DarkMode"
-        Color="Color.Primary"
-        UncheckedColor="Color.Primary"
-        Style="margin: auto;"
-        ThumbIcon="@(darkMode ? Icons.Material.Filled.DarkMode : Icons.Material.Filled.LightMode)"
-        ThumbIconColor="Color.Info"
-        Size="Size.Large" />
-
+    <!-- Screen select -->
+    <div style="position: relative; height: 100%;">
         <MudToggleGroup T="string"
         @bind-Value="Screen"
         Outlined="false"
@@ -46,7 +37,7 @@
         CheckMark="false"
         FixedContent="false"
         Disabled="false"
-        Style="width: auto;">
+        Style="height: 100% !important;">
 
             <MudToggleItem Value="@("Dashboard")">
                 <MudIcon Icon="@Icons.Material.Filled.Home" />

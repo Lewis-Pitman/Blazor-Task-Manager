@@ -14,19 +14,19 @@ namespace BlazorTaskManager.Services
             _dbContextFactory = dbContextFactory;
         }
 
-        public TaskItem GetTask(Guid taskId)
+        public async Task<TaskItem> GetTaskAsync(Guid taskId)
         {
             using (var context = _dbContextFactory.CreateDbContext())
             {
-                return context.TaskItem.FirstOrDefault(item => item.Id == taskId);
+                return await context.TaskItem.FirstOrDefaultAsync(item => item.Id == taskId);
             }
         }
 
-        public List<TaskItem> GetAllTasksWithTabId(Guid tabId)
+        public async Task<List<TaskItem>> GetAllTasksWithTabIdAsync(Guid tabId)
         {
             using (var context = _dbContextFactory.CreateDbContext())
             {
-                return context.TaskItem.Where(task => task.TabId == tabId).ToList();
+                return await context.TaskItem.Where(task => task.TabId == tabId).ToListAsync();
             }
         }
 
@@ -83,28 +83,28 @@ namespace BlazorTaskManager.Services
         }
 
         // Search
-        public List<TaskItem> GetTaskWithStatus(string status)
+        public async  Task<List<TaskItem>> GetTaskWithStatusAsync(string status)
         {
             using (var context = _dbContextFactory.CreateDbContext())
             {
-                return context.TaskItem.Where(item => item.Status == status).ToList();
+                return await context.TaskItem.Where(item => item.Status == status).ToListAsync();
             }
         }
 
-        public List<TaskItem> GetTaskWithTitle(string title)
+        public async  Task<List<TaskItem>> GetTaskWithTitleAsync(string title)
         {
             using (var context = _dbContextFactory.CreateDbContext())
             {
-                return context.TaskItem.Where(item => item.Title == title).ToList();
+                return await context.TaskItem.Where(item => item.Title == title).ToListAsync();
             }
         }
 
         
-        public List<TaskItem> GetTaskByDate(DateTime dateTime, Guid tabId)
+        public async  Task<List<TaskItem>> GetTaskByDateAsync(DateTime dateTime, Guid tabId)
         {
             using (var context = _dbContextFactory.CreateDbContext())
             {
-                return context.TaskItem.Where(item => item.DueDate == dateTime && item.TabId == tabId).ToList();
+                return await context.TaskItem.Where(item => item.DueDate == dateTime && item.TabId == tabId).ToListAsync();
             }
         }
         

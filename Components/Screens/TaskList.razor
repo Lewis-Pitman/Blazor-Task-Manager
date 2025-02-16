@@ -4,7 +4,10 @@
 
 <!-- Grid -->
 <MudDataGrid T="TaskItem" @ref="dataGrid" Items="@allTasks" MultiSelection="true" SortMode="SortMode.Multiple" Filterable="true" QuickFilter="@_quickFilter"
-RowClick="@RowClicked" SelectedItemsChanged="@SelectedItemsChanged" Elevation="0" Style="position: relative; top: 0px; height: 100%; width: 100%;"
+RowClick="@RowClicked" SelectedItemsChanged="@SelectedItemsChanged" Elevation="0" Style="position: relative; 
+                                                                                         top: 0px; 
+                                                                                         height: 100%; 
+                                                                                         width: 100%;"
 HeaderClass="blue" RowStyleFunc="RowStyleFunc">
     <ToolBarContent>
         <MudPaper Class="black">
@@ -96,9 +99,9 @@ HeaderClass="blue" RowStyleFunc="RowStyleFunc">
     private bool isViewing = false;
     private TaskItem selectedTask;
 
-    protected override void OnParametersSet()
+    protected async override void OnParametersSet()
     {
-        allTasks = taskService.GetAllTasksWithTabId(CurrentTabId);
+        allTasks = await taskService.GetAllTasksWithTabIdAsync(CurrentTabId);
         StateHasChanged = false;
 
         base.OnParametersSet();
@@ -202,7 +205,7 @@ HeaderClass="blue" RowStyleFunc="RowStyleFunc">
                 taskService.RemoveTask(task);
             }
 
-            allTasks = taskService.GetAllTasksWithTabId(CurrentTabId);
+            allTasks = await taskService.GetAllTasksWithTabIdAsync(CurrentTabId);
         }
     }
 

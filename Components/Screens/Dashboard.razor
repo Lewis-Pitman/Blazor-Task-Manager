@@ -44,15 +44,15 @@
 
 	private List<TaskItem>? todaysTasks;
 
-	protected override void OnParametersSet()
+	protected async override void OnParametersSet()
 	{
-		var allTasks = taskService.GetAllTasksWithTabId(CurrentTabId);
+		var allTasks = await taskService.GetAllTasksWithTabIdAsync(CurrentTabId);
 
 		todoTasks = allTasks.Where(task => task.Status == "To-do").Count();
 		inProgressTasks = allTasks.Where(task => task.Status == "In progress").Count();
 		doneTasks = allTasks.Where(task => task.Status == "Done").Count();
 
-		todaysTasks = taskService.GetTaskByDate(DateTime.Today, CurrentTabId);
+		todaysTasks = await taskService.GetTaskByDateAsync(DateTime.Today, CurrentTabId);
 
 		base.OnParametersSet();
 	}

@@ -1,49 +1,98 @@
 ﻿@inject TaskService taskService
+@inject IModalService Modal
 
 <!-- https://mudblazor.com/components/dropzone#miscellaneous-kanban -->
 
-<MudDropContainer T="TaskItem" @ref="_dropContainer" Items="@_tasks" ItemsSelector="@((item,column) => item.Status == column)" ItemDropped="TaskUpdated" Class="d-flex flex-row">
+<MudDropContainer T="TaskItem" @ref="_dropContainer" Items="@_tasks" ItemsSelector="@((item,column) => item.Status == column)" 
+ItemDropped="TaskUpdated" Class="d-flex flex-row" Style="position: fixed !important;
+														 width: 100% !important;
+													     top: 48px !important;
+														 bottom: 0px !important;">
 	<ChildContent>
 		@foreach (var item in _sections)
 		{
-			<MudPaper Elevation="0" Width="224px" MinHeight="400px" Class="pa-4 ma-4 d-flex flex-column mud-background-gray rounded-lg">
-				<MudToolBar Gutters="false">
+			<MudPaper Elevation="0" Width="100%" MinHeight="100%" Class="d-flex flex-column" Style="background-color: #2d2d2d !important;">
+				<!-- Style attribute used instead of class as class doesn't appear to work -->
+				<MudToolBar Gutters="false" Style="background-color: #2196f3 !important;
+												   color: white !important;
+												   text-align: center !important;">
 					<MudText Typo="Typo.subtitle1"><b>@item.Name</b></MudText>
-					<MudSpacer />
 				</MudToolBar>
 				<MudDropZone T="TaskItem" Identifier="@item.Name" Class="mud-height-full" />
 
-				<MudButton OnClick="@(() => item.NewTaskOpen = !item.NewTaskOpen)" StartIcon="@Icons.Material.Filled.Add" FullWidth="true" Class="rounded-lg py-2">Add Task</MudButton>
-				
+				<MudButton OnClick="AddTask" StartIcon="@Icons.Material.Filled.Add" 
+				FullWidth="true" Style="background-color: black !important;
+										bottom: 0px !important;
+										border-radius: 0px !important;">
+					Add Task
+				</MudButton>
+
 			</MudPaper>
 		}
 	</ChildContent>
 	<ItemRenderer>
-		<MudPaper Elevation="25" Class="pa-4 rounded-lg my-3">@context.Title</MudPaper>
+		<!-- Tasks -->
+		<MudPaper onclick="viewTask()" Elevation="25" Class="pa-4 rounded-lg my-3 mx-3">
+			<h2><b>@context.Title</b></h2>
+			<br />
+			<p><b>Description</b>: @context.Description</p>
+			<br />
+			@if(context.DueDate != null)
+			{
+				<p><b>Due by:</b> @context.DueDate.ToString().Substring(0, 10)</p>
+			}
+			else
+			{
+				<p><b>No due date</b></p>
+			}
+		</MudPaper>
 	</ItemRenderer>
 </MudDropContainer>
 
 @code {
-	[Parameter]
-	public Guid CurrentTabId { get; set; }
-	
 	private MudDropContainer<TaskItem> _dropContainer;
-	
+
 	private List<TaskItem> _tasks;
+
+	private Guid currentTabId;
+
+	[Parameter]
+	public Guid CurrentTabId
+	{
+		get { return currentTabId; }
+		set
+		{
+			currentTabId = value;
+			UpdateBoard(value);
+		}
+	}
+
+	private async void UpdateBoard(Guid tabId)
+	{
+		_tasks = await taskService.GetAllTasksWithTabIdAsync(tabId);
+
+		// Force next render cycle
+		await Task.Delay(1);
+
+		_dropContainer?.Refresh();
+		StateHasChanged();
+	}
 
 	protected override void OnInitialized()
 	{
-		_tasks = taskService.GetAllTasksWithTabId(CurrentTabId);
+		_dropContainer?.Refresh();
 	}
 
-	private bool _addSectionOpen;
-	/* handling board events */
 	private void TaskUpdated(MudItemDropInfo<TaskItem> info)
 	{
+		// Update position on board
 		info.Item.Status = info.DropzoneIdentifier;
+
+		// Save change to database
+		taskService.EditTask(info.Item.Id, info.Item);
 	}
 
-	/* Setup for board  */
+	// Setup for board
 	private List<KanBanSections> _sections = new()
 		{
 			new KanBanSections("To-do", false, String.Empty),
@@ -67,7 +116,7 @@
 
 	private void AddTask()
 	{
-		
+		Modal.Show<AddTask>();
 	}
 
 }
