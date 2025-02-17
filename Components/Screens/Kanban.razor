@@ -4,7 +4,7 @@
 
 <!-- https://mudblazor.com/components/dropzone#miscellaneous-kanban -->
 
-<MudDropContainer T="TaskItem" @ref="_dropContainer" Items="@_tasks" ItemsSelector="@((item,column) => item.Status == column)" 
+<MudDropContainer T="TaskItem" @ref="_dropContainer" Items="@allTasks" ItemsSelector="@((item,column) => item.Status == column)" 
 ItemDropped="TaskUpdated" Class="d-flex flex-row" Style="position: fixed !important;
 														 width: 100% !important;
 													     top: 48px !important;
@@ -33,7 +33,7 @@ ItemDropped="TaskUpdated" Class="d-flex flex-row" Style="position: fixed !import
 	</ChildContent>
 	<ItemRenderer>
 		<!-- Tasks -->
-		<MudPaper onclick="viewTask()" Elevation="25" Class="pa-4 rounded-lg my-3 mx-3">
+		<MudPaper Elevation="0" Class="pa-4 rounded-lg my-3 mx-3">
 			<h2><b>@context.Title</b></h2>
 			<br />
 			<p><b>Description</b>: @context.Description</p>
@@ -46,14 +46,29 @@ ItemDropped="TaskUpdated" Class="d-flex flex-row" Style="position: fixed !import
 			{
 				<p><b>No due date</b></p>
 			}
+
+			<MudToolBar Gutters="false">
+				<MudIconButton Icon="@Icons.Material.Filled.Delete" aria-label="delete" Color="Color.Warning" OnClick="@(() => OnDeleteClicked(context))" />
+				<MudIconButton Icon="@Icons.Material.Filled.Edit" aria-label="edit" Color="Color.Primary" OnClick="@(() => OnEditClicked(context))" />
+			</MudToolBar>
 		</MudPaper>
 	</ItemRenderer>
 </MudDropContainer>
 
+<!-- Message popups -->
+<MudMessageBox @ref="confirmDeleteMessage" Title="Warning" CancelText="Cancel">
+	<MessageContent>
+		This action will <b>delete all currently selected tasks.</b> this <b>cannot</b> be undone.
+	</MessageContent>
+	<YesButton>
+		<MudButton Variant="Variant.Filled" Color="Color.Error" StartIcon="@Icons.Material.Filled.DeleteForever">Delete</MudButton>
+	</YesButton>
+</MudMessageBox>
+
 @code {
 	private MudDropContainer<TaskItem> _dropContainer;
 
-	private List<TaskItem> _tasks;
+	private List<TaskItem> allTasks;
 
 	private Guid currentTabId;
 
@@ -70,7 +85,7 @@ ItemDropped="TaskUpdated" Class="d-flex flex-row" Style="position: fixed !import
 
 	private async void UpdateBoard(Guid tabId)
 	{
-		_tasks = await taskService.GetAllTasksWithTabIdAsync(tabId);
+		allTasks = await taskService.GetAllTasksWithTabIdAsync(tabId);
 
 		// Force next render cycle
 		await Task.Delay(1);
@@ -136,5 +151,55 @@ ItemDropped="TaskUpdated" Class="d-flex flex-row" Style="position: fixed !import
 		var options = new DialogOptions { CloseOnEscapeKey = true };
 
 		_dialogReference = DialogService.Show<AddTask>("Add task", parameters, options);
+	}
+
+	// Delete task
+	private MudMessageBox confirmDeleteMessage;
+
+	private async void OnDeleteClicked(TaskItem task)
+	{
+		bool? confirmDelete = await DeletePopupAsync();
+
+		if (confirmDelete == true)
+		{
+			taskService.RemoveTask(task);
+			UpdateBoard(currentTabId);
+		}
+	}
+
+	private async Task<bool?> DeletePopupAsync()
+	{
+		bool? result = await confirmDeleteMessage.ShowAsync();
+		result = result == null ? false : true;
+		StateHasChanged();
+
+		return result;
+	}
+
+	// Edit task
+
+	private async void OnSaveTaskClicked()
+	{
+		UpdateBoard(currentTabId);
+		DialogService.Close(_dialogReference);
+	}
+
+	private void OnCloseTaskClicked()
+	{
+		DialogService.Close(_dialogReference);
+	}
+
+	private void OnEditClicked(TaskItem task)
+	{
+		var parameters = new DialogParameters<EditTask>
+		{
+			{ viewTask => viewTask.TaskId, task.Id },
+			{ viewTask => viewTask.OnSaveClicked, EventCallback.Factory.Create(this, OnSaveTaskClicked) },
+			{ viewTask => viewTask.OnCloseClicked, EventCallback.Factory.Create(this, OnCloseTaskClicked) }
+		};
+
+		var options = new DialogOptions { CloseOnEscapeKey = true };
+
+		_dialogReference = DialogService.Show<EditTask>("Edit task", parameters, options);
 	}
 }
