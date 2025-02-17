@@ -3,16 +3,12 @@ using BlazorTaskManager.Database;
 using BlazorTaskManager.Services;
 using Microsoft.EntityFrameworkCore;
 using MudBlazor.Services;
-using Blazored.Modal;
 
 var builder = WebApplication.CreateBuilder(args);
 var connectionString = builder.Configuration.GetConnectionString("TabDB");
 
 // Add MudBlazor services
 builder.Services.AddMudServices();
-
-// Add Blazored Modals services
-builder.Services.AddBlazoredModal();
 
 // Add services to the container.
 builder.Services.AddRazorComponents()

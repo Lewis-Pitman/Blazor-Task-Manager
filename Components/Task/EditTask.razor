@@ -17,15 +17,9 @@ else
     <p>Edit:</p>
 }
 
-<button @onclick="Close">Close</button>
-
-
 @code {
     [Parameter]
     public EventCallback OnSubmitClicked { get; set; }
-
-    [CascadingParameter]
-    private BlazoredModalInstance Modal { get; set; }
 
     [Parameter]
     public TaskItem taskItem { get; set; }
@@ -37,10 +31,5 @@ else
         taskService.EditTask(taskItem.Id, taskItem);
 
         OnSubmitClicked.InvokeAsync();
-    }
-
-    private void Close()
-    {
-        Modal.CloseAsync();
     }
 }

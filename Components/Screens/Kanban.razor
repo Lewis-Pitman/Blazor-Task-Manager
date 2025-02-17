@@ -1,5 +1,6 @@
 ﻿@inject TaskService taskService
-@inject IModalService Modal
+@inject IDialogService DialogService
+@rendermode InteractiveServer
 
 <!-- https://mudblazor.com/components/dropzone#miscellaneous-kanban -->
 
@@ -20,8 +21,8 @@ ItemDropped="TaskUpdated" Class="d-flex flex-row" Style="position: fixed !import
 				</MudToolBar>
 				<MudDropZone T="TaskItem" Identifier="@item.Name" Class="mud-height-full" />
 
-				<MudButton OnClick="AddTask" StartIcon="@Icons.Material.Filled.Add" 
-				FullWidth="true" Style="background-color: black !important;
+				<MudButton OnClick="OpenAddTaskDialogAsync" StartIcon="@Icons.Material.Filled.Add"
+						   FullWidth="true" Style="background-color: black !important;
 										bottom: 0px !important;
 										border-radius: 0px !important;">
 					Add Task
@@ -114,9 +115,10 @@ ItemDropped="TaskUpdated" Class="d-flex flex-row" Style="position: fixed !import
 		}
 	}
 
-	private void AddTask()
+	private Task OpenAddTaskDialogAsync()
 	{
-		Modal.Show<AddTask>();
-	}
+		var options = new DialogOptions { CloseOnEscapeKey = true };
 
+		return DialogService.ShowAsync<AddTask>("Simple Dialog", options);
+	}
 }

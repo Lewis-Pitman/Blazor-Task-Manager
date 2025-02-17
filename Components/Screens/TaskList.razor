@@ -1,5 +1,5 @@
 ﻿@inject TaskService taskService
-@inject IModalService Modal
+@inject IDialogService DialogService
 @rendermode InteractiveServer
 
 <!-- Grid -->
@@ -46,7 +46,7 @@ HeaderClass="blue" RowStyleFunc="RowStyleFunc">
             <MudIconButton Icon="@Icons.Material.Filled.HourglassEmpty" aria-label="change status to to-do" Color="Color.Primary" OnClick="@(() => OnEditStatusClicked("To-do"))" />
             <MudIconButton Icon="@Icons.Material.Filled.HourglassBottom" aria-label="change status to in progress" Color="Color.Primary" OnClick="@(() => OnEditStatusClicked("In progress"))" />
             <MudIconButton Icon="@Icons.Material.Filled.Done" aria-label="change status to done" Color="Color.Primary" OnClick="@(() => OnEditStatusClicked("Done"))" />
-            <MudIconButton Icon="@Icons.Material.Filled.Add" aria-label="add new" Color="Color.Primary" OnClick="OnAddClicked" />
+            <MudIconButton Icon="@Icons.Material.Filled.Add" aria-label="add new" Color="Color.Primary" OnClick="OpenAddTaskDialogAsync" />
         </MudPaper>
 
     </ToolBarContent>
@@ -147,14 +147,11 @@ HeaderClass="blue" RowStyleFunc="RowStyleFunc">
     };
 
     // Events
-    void RowClicked(DataGridRowClickEventArgs<TaskItem> args)
+    private Task RowClicked(DataGridRowClickEventArgs<TaskItem> args)
     {
-        var parameters = new ModalParameters();
-        parameters.Add(nameof(EditTask.taskItem), args.Item);
+        var options = new DialogOptions { CloseOnEscapeKey = true };
 
-        var options = new ModalOptions {  Size = ModalSize.Medium };
-
-        Modal.Show<EditTask>("Test", parameters, options);
+        return DialogService.ShowAsync<ViewTask>("Edit task", options);
     }
 
     void SelectedItemsChanged(HashSet<TaskItem> items)
@@ -184,14 +181,11 @@ HeaderClass="blue" RowStyleFunc="RowStyleFunc">
 
     }
 
-    private void OnAddClicked()
+    private Task OpenAddTaskDialogAsync()
     {
-        var options = new ModalOptions()
-        {
-            Class = "modal"
-        };
-        
-        Modal.Show<AddTask>(options);
+        var options = new DialogOptions { CloseOnEscapeKey = true };
+
+        return DialogService.ShowAsync<AddTask>("Simple Dialog", options);
     }
 
     private async void OnDeleteClicked()
