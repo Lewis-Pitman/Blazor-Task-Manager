@@ -52,8 +52,9 @@ HeaderClass="blue" RowStyleFunc="RowStyleFunc">
     </ToolBarContent>
     <Columns>
         <SelectColumn T="TaskItem" />
-        <PropertyColumn Property="@(task => task.Title ?? "No title")" Title="Title" Filterable="false" />
-        <PropertyColumn Property="@(task => task.Description ?? "No description")" Title="Description" Filterable="false" />
+        <!-- If title or description are too long they are shortened -->
+        <PropertyColumn Property="@(task => StringHelper.ShortenString(task.Title, "title", 45))" Title="Title" Filterable="false" />
+        <PropertyColumn Property="@(task => StringHelper.ShortenString(task.Description, "description", 80))" Title="Description" Filterable="false" />
         <PropertyColumn Property="@(task => task.DueDate != null ? task.DueDate.ToString().Substring(0, 10) : "No due date")" Title="Due date" Filterable="false" />
         <PropertyColumn Property="task => task.Status" Title="Status" Filterable="false" />
     </Columns>

@@ -24,7 +24,9 @@
 	{
 		@foreach(var task in todaysTasks)
 		{
-			<p>Title: @task.Title   Description: @task.Description    Status: @task.Status</p>
+			<p>Title: @(StringHelper.ShortenString(task.Title, "title", 30))
+				Description: @(StringHelper.ShortenString(task.Description, "description", 50))
+				Status: @task.Status</p>
 		}
 	}
 	else
