@@ -9,6 +9,7 @@ var connectionString = builder.Configuration.GetConnectionString("TabDB");
 
 // Add MudBlazor services
 builder.Services.AddMudServices();
+builder.Services.AddMudBlazorDialog();
 
 // Add services to the container.
 builder.Services.AddRazorComponents()

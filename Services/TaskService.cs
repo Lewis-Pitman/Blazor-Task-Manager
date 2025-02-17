@@ -62,8 +62,11 @@ namespace BlazorTaskManager.Services
         {
             using (var context = _dbContextFactory.CreateDbContext())
             {
-                context.TaskItem.Remove(task);
-                context.SaveChanges();
+                if(context.TaskItem.Contains(task))
+                {
+                    context.TaskItem.Remove(task);
+                    context.SaveChanges();
+                }
             }
         }
 

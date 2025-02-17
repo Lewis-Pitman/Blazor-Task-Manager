@@ -52,9 +52,9 @@ HeaderClass="blue" RowStyleFunc="RowStyleFunc">
     </ToolBarContent>
     <Columns>
         <SelectColumn T="TaskItem" />
-        <PropertyColumn Property="task => task.Title" Title="Title" Filterable="false" />
-        <PropertyColumn Property="task => task.Description" Title="Description" Filterable="false" />
-        <PropertyColumn Property="task => task.DueDate.ToString().Substring(0, 10)" Title="Due date" Filterable="false" />
+        <PropertyColumn Property="@(task => task.Title ?? "No title")" Title="Title" Filterable="false" />
+        <PropertyColumn Property="@(task => task.Description ?? "No description")" Title="Description" Filterable="false" />
+        <PropertyColumn Property="@(task => task.DueDate != null ? task.DueDate.ToString().Substring(0, 10) : "No due date")" Title="Due date" Filterable="false" />
         <PropertyColumn Property="task => task.Status" Title="Status" Filterable="false" />
     </Columns>
     <PagerContent>
@@ -147,6 +147,28 @@ HeaderClass="blue" RowStyleFunc="RowStyleFunc">
     };
 
     // Events
+    private IDialogReference? _dialogReference;
+
+    private async void OnTaskAdded()
+    {
+        allTasks = await taskService.GetAllTasksWithTabIdAsync(CurrentTabId);
+
+        DialogService.Close(_dialogReference);
+    }
+
+    private async void OpenAddTaskDialogAsync()
+    {
+        var parameters = new DialogParameters<AddTask>
+        {
+            { addTask => addTask.CurrentTabId, CurrentTabId },
+            { addTask => addTask.OnSubmitClicked, EventCallback.Factory.Create(this, OnTaskAdded) }
+        };
+
+        var options = new DialogOptions { CloseOnEscapeKey = true };
+
+        _dialogReference = DialogService.Show<AddTask>("Add task", parameters, options);
+    }
+
     private Task RowClicked(DataGridRowClickEventArgs<TaskItem> args)
     {
         var options = new DialogOptions { CloseOnEscapeKey = true };
@@ -181,12 +203,6 @@ HeaderClass="blue" RowStyleFunc="RowStyleFunc">
 
     }
 
-    private Task OpenAddTaskDialogAsync()
-    {
-        var options = new DialogOptions { CloseOnEscapeKey = true };
-
-        return DialogService.ShowAsync<AddTask>("Add task", options);
-    }
 
     private async void OnDeleteClicked()
     {

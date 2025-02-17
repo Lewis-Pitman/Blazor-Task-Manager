@@ -21,8 +21,8 @@ ItemDropped="TaskUpdated" Class="d-flex flex-row" Style="position: fixed !import
 				</MudToolBar>
 				<MudDropZone T="TaskItem" Identifier="@item.Name" Class="mud-height-full" />
 
-				<MudButton OnClick="OpenAddTaskDialogAsync" StartIcon="@Icons.Material.Filled.Add"
-						   FullWidth="true" Style="background-color: black !important;
+				<MudButton OnClick="@(() => OpenAddTaskDialogAsync(item.Name))" StartIcon="@Icons.Material.Filled.Add"
+				FullWidth="true" Style="background-color: black !important;
 										bottom: 0px !important;
 										border-radius: 0px !important;">
 					Add Task
@@ -115,10 +115,26 @@ ItemDropped="TaskUpdated" Class="d-flex flex-row" Style="position: fixed !import
 		}
 	}
 
-	private Task OpenAddTaskDialogAsync()
+	private IDialogReference? _dialogReference;
+
+	private async void OnTaskAdded()
 	{
+		UpdateBoard(currentTabId);
+
+		DialogService.Close(_dialogReference);
+	}
+
+	private async void OpenAddTaskDialogAsync(string selectedStatus)
+	{
+		var parameters = new DialogParameters<AddTask>
+		{
+			{ addTask => addTask.CurrentTabId, CurrentTabId },
+			{ addTask => addTask.OnSubmitClicked, EventCallback.Factory.Create(this, OnTaskAdded) },
+			{ addTask => addTask.SelectedStatus, selectedStatus }
+		};
+
 		var options = new DialogOptions { CloseOnEscapeKey = true };
 
-		return DialogService.ShowAsync<AddTask>("Add task", options);
+		_dialogReference = DialogService.Show<AddTask>("Add task", parameters, options);
 	}
 }

@@ -1,25 +1,28 @@
 ﻿@inject TaskService taskService
-
 @rendermode InteractiveServer
 
-<EditForm Model="@taskItem" OnValidSubmit="HandleSubmit">
-    <MudToolBar Gutters="false">
-        <MudTextField Style="margin: 10px !important;" T="string" Label="Title" Variant="Variant.Outlined" Placeholder="Enter title" @bind-value="@taskItem.Title" Lines="1" />
+<MudDialog>
+    <DialogContent>
+        <MudToolBar Gutters="false">
+            <MudTextField Style="margin: 5px !important; margin-top: 0px !important;" T="string" Label="Title" Variant="Variant.Outlined" Placeholder="Enter title" @bind-value="@taskItem.Title" Lines="1" />
 
-        <MudSelect Style="margin: 10px !important; width: 200px !important;" Placeholder="Status" @bind-value="@taskItem.Status">
-            <MudSelectItem Value="@("To-do")">To-do</MudSelectItem>
-            <MudSelectItem Value="@("In progress")">In progress</MudSelectItem>
-            <MudSelectItem Value="@("Done")">Done</MudSelectItem>
-        </MudSelect>
+            <MudSelect Style="margin: 10px !important; width: 200px !important;" Placeholder="Status" Value="@taskItem.Status">
+                <MudSelectItem Value="@("To-do")">To-do</MudSelectItem>
+                <MudSelectItem Value="@("In progress")">In progress</MudSelectItem>
+                <MudSelectItem Value="@("Done")">Done</MudSelectItem>
+            </MudSelect>
 
-        <MudInput Style="margin: 10px !important;" InputType="InputType.Date" Placeholder="Due date" @bind-value="@taskItem.DueDate" />
-    </MudToolBar>
+            <MudDatePicker Editable="true" DateFormat="dd.MM.yyyy" Style="margin: 10px !important;" Placeholder="Due date" @bind-date="@taskItem.DueDate" ImmediateText="true" />
+        </MudToolBar>
 
-    <br/>
+        <br/>
 
-    <MudTextField Style="margin: 10px !important;" T="string" Label="Description" Variant="Variant.Outlined" Placeholder="Enter description" @bind-value="taskItem.Description" Lines="5" />
-    <MudButton Color="Color.Primary" Style="margin: 10px !important;" type="submit">Submit</MudButton>
-</EditForm>
+        <MudTextField Style="margin: 10px !important;" T="string" Label="Description" Variant="Variant.Outlined" Placeholder="Enter description" @bind-value="taskItem.Description" Lines="5" />
+    </DialogContent>
+    <DialogActions>
+        <MudButton Color="Color.Primary" Style="margin: 10px !important;" OnClick="HandleSubmit">Submit</MudButton>
+    </DialogActions>
+</MudDialog>
 
 @code {
     [Parameter]
@@ -28,12 +31,25 @@
     [Parameter]
     public EventCallback OnSubmitClicked { get; set; }
 
+    // For when a task is made from the kanban screen
+    [Parameter]
+    public string? SelectedStatus { get; set; }
+
     public TaskItem taskItem = new TaskItem();
+
+    protected override void OnInitialized()
+    {
+        if(SelectedStatus != null) { taskItem.Status = SelectedStatus; }
+
+        base.OnInitialized();
+    }
 
     public void HandleSubmit()
     {
         taskItem.Id = new Guid();
         taskItem.TabId = CurrentTabId;
+
+        taskItem.Status = taskItem.Status ?? "To-do";
 
         taskService.AddTask(taskItem);
 
