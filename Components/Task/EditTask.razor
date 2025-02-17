@@ -1,35 +1,60 @@
 ﻿@inject TaskService taskService
 @rendermode InteractiveServer
 
-@if (isEditing)
-{
-    <EditForm Model="@taskItem" OnValidSubmit="HandleSubmit">
-        <input type="text" placeholder="title" @bind-value="@taskItem.Title"/>
-        <input type="text" placeholder="description" @bind-value="@taskItem.Description"/>
-        <input type="text" placeholder="status" @bind-value="@taskItem.Status"/>
-        <button type="submit">Submit</button>
-    </EditForm>
-}
-else
-{
-    <p>Title: @taskItem.Title, Description: @taskItem.Description, Status: @taskItem.Status, Due: @taskItem.DueDate</p>
-    <br />
-    <p>Edit:</p>
-}
+<MudDialog>
+    <DialogContent>
+        <MudToolBar Gutters="false">
+            <MudTextField Style="margin: 5px !important; margin-top: 0px !important;" T="string" Label="Title" Variant="Variant.Outlined" Placeholder="Enter title" @bind-value="@taskItem.Title" Lines="1" />
+
+            <MudSelect Style="margin: 10px !important; width: 200px !important;" Placeholder="Status" Value="@taskItem.Status">
+                <MudSelectItem Value="@("To-do")">To-do</MudSelectItem>
+                <MudSelectItem Value="@("In progress")">In progress</MudSelectItem>
+                <MudSelectItem Value="@("Done")">Done</MudSelectItem>
+            </MudSelect>
+
+            <MudDatePicker Editable="true" DateFormat="dd.MM.yyyy" Style="margin: 10px !important;" Placeholder="Due date" @bind-date="@taskItem.DueDate" ImmediateText="true" />
+        </MudToolBar>
+
+        <br />
+
+        <MudTextField Style="margin: 10px !important;" T="string" Label="Description" Variant="Variant.Outlined" Placeholder="Enter description" @bind-value="taskItem.Description" Lines="5" />
+    </DialogContent>
+    <DialogActions>
+        <MudButton Color="Color.Primary" Style="margin: 10px !important;" OnClick="HandleSave">Save</MudButton>
+        <MudButton Style="margin: 10px !important;" OnClick="HandleClose">Close</MudButton>
+    </DialogActions>
+</MudDialog>
 
 @code {
     [Parameter]
-    public EventCallback OnSubmitClicked { get; set; }
+    public Guid TaskId { get; set; }
 
     [Parameter]
-    public TaskItem taskItem { get; set; }
+    public EventCallback OnSaveClicked { get; set; }
 
-    private bool isEditing = false;
+    [Parameter]
+    public EventCallback OnCloseClicked { get; set; }
 
-    public void HandleSubmit()
+    public TaskItem taskItem;
+
+    protected override async void OnInitialized()
     {
-        taskService.EditTask(taskItem.Id, taskItem);
+        taskItem = await taskService.GetTaskAsync(TaskId);
 
-        OnSubmitClicked.InvokeAsync();
+        base.OnInitialized();
+    }
+
+    public void HandleSave()
+    {
+        taskItem.Status = taskItem.Status ?? "To-do";
+
+        taskService.EditTask(TaskId, taskItem);
+
+        OnSaveClicked.InvokeAsync();
+    }
+
+    public void HandleClose()
+    {
+        OnCloseClicked.InvokeAsync();
     }
 }

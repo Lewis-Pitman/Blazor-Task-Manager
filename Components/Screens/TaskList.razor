@@ -149,6 +149,7 @@ HeaderClass="blue" RowStyleFunc="RowStyleFunc">
     // Events
     private IDialogReference? _dialogReference;
 
+    // Add task
     private async void OnTaskAdded()
     {
         allTasks = await taskService.GetAllTasksWithTabIdAsync(CurrentTabId);
@@ -169,11 +170,31 @@ HeaderClass="blue" RowStyleFunc="RowStyleFunc">
         _dialogReference = DialogService.Show<AddTask>("Add task", parameters, options);
     }
 
-    private Task RowClicked(DataGridRowClickEventArgs<TaskItem> args)
+    // Edit/View task
+    private async void OnSaveTaskClicked()
     {
+        allTasks = await taskService.GetAllTasksWithTabIdAsync(CurrentTabId);
+
+        DialogService.Close(_dialogReference);
+    }
+
+    private void OnCloseTaskClicked()
+    {
+        DialogService.Close(_dialogReference);
+    }
+
+    private void RowClicked(DataGridRowClickEventArgs<TaskItem> args)
+    {
+        var parameters = new DialogParameters<EditTask>
+        {
+            { viewTask => viewTask.TaskId, args.Item.Id },
+            { viewTask => viewTask.OnSaveClicked, EventCallback.Factory.Create(this, OnSaveTaskClicked) },
+            { viewTask => viewTask.OnCloseClicked, EventCallback.Factory.Create(this, OnCloseTaskClicked) }
+        };
+
         var options = new DialogOptions { CloseOnEscapeKey = true };
 
-        return DialogService.ShowAsync<ViewTask>("Edit task", options);
+        _dialogReference = DialogService.Show<EditTask>("Edit task", parameters, options);
     }
 
     void SelectedItemsChanged(HashSet<TaskItem> items)
@@ -202,7 +223,6 @@ HeaderClass="blue" RowStyleFunc="RowStyleFunc">
         }
 
     }
-
 
     private async void OnDeleteClicked()
     {
