@@ -2,14 +2,23 @@
 
 @rendermode InteractiveServer
 
-<h1>AddTask</h1>
-
 <EditForm Model="@taskItem" OnValidSubmit="HandleSubmit">
-    <input type="text" placeholder="title" @bind-value="@taskItem.Title" />
-    <input type="text" placeholder="description" @bind-value="@taskItem.Description" />
-    <input type="text" placeholder="status" @bind-value="@taskItem.Status" />
-    <input type="date" placeholder="due date" @bind-value="@taskItem.DueDate" />
-    <button type="submit">Submit</button>
+    <MudToolBar Gutters="false">
+        <MudTextField Style="margin: 10px !important;" T="string" Label="Title" Variant="Variant.Outlined" Placeholder="Enter title" @bind-value="@taskItem.Title" Lines="1" />
+
+        <MudSelect Style="margin: 10px !important; width: 200px !important;" Placeholder="Status" @bind-value="@taskItem.Status">
+            <MudSelectItem Value="@("To-do")">To-do</MudSelectItem>
+            <MudSelectItem Value="@("In progress")">In progress</MudSelectItem>
+            <MudSelectItem Value="@("Done")">Done</MudSelectItem>
+        </MudSelect>
+
+        <MudInput Style="margin: 10px !important;" InputType="InputType.Date" Placeholder="Due date" @bind-value="@taskItem.DueDate" />
+    </MudToolBar>
+
+    <br/>
+
+    <MudTextField Style="margin: 10px !important;" T="string" Label="Description" Variant="Variant.Outlined" Placeholder="Enter description" @bind-value="taskItem.Description" Lines="5" />
+    <MudButton Color="Color.Primary" Style="margin: 10px !important;" type="submit">Submit</MudButton>
 </EditForm>
 
 @code {
@@ -25,6 +34,7 @@
     {
         taskItem.Id = new Guid();
         taskItem.TabId = CurrentTabId;
+
         taskService.AddTask(taskItem);
 
         taskItem = new TaskItem();
