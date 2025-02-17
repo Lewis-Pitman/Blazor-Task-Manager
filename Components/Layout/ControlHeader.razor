@@ -89,7 +89,6 @@
         OnDarkModeToggle.InvokeAsync(darkMode);
     }
 
-    #region Properties
     [Parameter]
     public EventCallback<string> OnScreenChange { get; set; }
 
@@ -134,9 +133,7 @@
             OnActiveTabChange.InvokeAsync(currentTabId);
         }
     }
-    #endregion
 
-    #region Dynamic Tabs
     // This code is taken from https://mudblazor.com/components/tabs#dynamic-tabs and modified where needed
     public MudDynamicTabs DynamicTabs;
     public List<TabView> UserTabs = new();
@@ -260,9 +257,7 @@
 
     void AddTabCallback() => AddTab(Guid.NewGuid());
     void CloseTabCallback(MudTabPanel panel) => RemoveTab((Guid)panel.ID);
-    #endregion
 
-    #region Message popups
     // This code is taken from https://mudblazor.com/components/messagebox#api and modified where needed
     private MudMessageBox confirmDeleteMessage;
     private MudMessageBox createTabMessage;
@@ -287,6 +282,5 @@
 
         return result;
     }
-    #endregion
 
 }

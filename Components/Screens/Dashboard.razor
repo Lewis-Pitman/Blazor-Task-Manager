@@ -1,4 +1,5 @@
 ﻿@inject TaskService taskService
+@inject IDialogService DialogService
 
 <div class="task-stats">
 	<span class="stat-block red">
@@ -18,16 +19,22 @@
 </div>
 
 <div class="todays-task-block blue">
-	<p>Today's tasks:</p>
+	<p style="width: 100%; background-color: black;"> <b>Today's tasks:</b> </p>
 
 	@if(todaysTasks?.Count != 0)
 	{
-		@foreach(var task in todaysTasks)
-		{
-			<p>Title: @(StringHelper.ShortenString(task.Title, "title", 30))
-				Description: @(StringHelper.ShortenString(task.Description, "description", 50))
-				Status: @task.Status</p>
-		}
+        <MudDataGrid T="TaskItem" Items="@todaysTasks" MultiSelection="true"
+                     RowClick="@RowClicked" Elevation="0" HeaderClass="blue" RowStyleFunc="RowStyleFunc">
+            <Columns>
+                <PropertyColumn Property="@(task => StringHelper.ShortenString(task.Title, "title", 45))" Title="Title" Filterable="false" />
+                <PropertyColumn Property="@(task => StringHelper.ShortenString(task.Description, "description", 80))" Title="Description" Filterable="false" />
+                <PropertyColumn Property="@(task => task.DueDate != null ? task.DueDate.ToString().Substring(0, 10) : "No due date")" Title="Due date" Filterable="false" />
+                <PropertyColumn Property="task => task.Status" Title="Status" Filterable="false" />
+            </Columns>
+            <PagerContent>
+                <MudDataGridPager T="TaskItem" />
+            </PagerContent>
+        </MudDataGrid>
 	}
 	else
 	{
@@ -57,5 +64,46 @@
 		todaysTasks = await taskService.GetTaskByDateAsync(DateTime.Today, CurrentTabId);
 
 		base.OnParametersSet();
+	}
+
+	// Todays tasks datagrid
+	private IDialogReference? _dialogReference;
+
+	private async void OnSaveTaskClicked()
+	{
+		todaysTasks = await taskService.GetTaskByDateAsync(DateTime.Today, CurrentTabId);
+
+		DialogService.Close(_dialogReference);
+	}
+
+	private void OnCloseTaskClicked()
+	{
+		DialogService.Close(_dialogReference);
+	}
+
+	private void RowClicked(DataGridRowClickEventArgs<TaskItem> args)
+	{
+		var parameters = new DialogParameters<EditTask>
+		{
+			{ viewTask => viewTask.TaskId, args.Item.Id },
+			{ viewTask => viewTask.OnSaveClicked, EventCallback.Factory.Create(this, OnSaveTaskClicked) },
+			{ viewTask => viewTask.OnCloseClicked, EventCallback.Factory.Create(this, OnCloseTaskClicked) }
+		};
+
+		var options = new DialogOptions { CloseOnEscapeKey = true };
+
+		_dialogReference = DialogService.Show<EditTask>("Edit task", parameters, options);
+	}
+
+	private string RowStyleFunc(TaskItem arg, int index)
+	{
+		// Hacky solution to styling problems
+		// Datagrid does have built-in row stripes, but these would be black due to background colour needing
+		// to be black to have the black toolbar
+
+		string lighterStripe = "background-color: #2d2d2d;";
+		string darkerStripe = "background-color: #535353;";
+
+		return index % 2 == 0 ? lighterStripe : darkerStripe;
 	}
 }
