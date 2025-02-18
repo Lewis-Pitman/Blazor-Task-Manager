@@ -5,9 +5,8 @@
 <!-- https://mudblazor.com/components/dropzone#miscellaneous-kanban -->
 
 <MudDropContainer T="TaskItem" @ref="_dropContainer" Items="@allTasks" ItemsSelector="@((item,column) => item.Status == column)" 
-ItemDropped="TaskUpdated" Class="d-flex flex-row" Style="position: fixed !important;
+ItemDropped="TaskUpdated" Class="d-flex flex-row" Style="position: relative !important;
 														 width: 100% !important;
-													     top: 48px !important;
 														 bottom: 0px !important;">
 	<ChildContent>
 		@foreach (var item in _sections)
@@ -23,6 +22,7 @@ ItemDropped="TaskUpdated" Class="d-flex flex-row" Style="position: fixed !import
 
 				<MudButton OnClick="@(() => OpenAddTaskDialogAsync(item.Name))" StartIcon="@Icons.Material.Filled.Add"
 				FullWidth="true" Style="background-color: black !important;
+										display: fixed !important;
 										bottom: 0px !important;
 										border-radius: 0px !important;">
 					Add Task
