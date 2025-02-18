@@ -6,7 +6,7 @@
         <MudToolBar Gutters="false">
             <MudTextField Style="margin: 5px !important; margin-top: 0px !important;" T="string" Label="Title" Variant="Variant.Outlined" Placeholder="Enter title" @bind-value="@taskItem.Title" Lines="1" />
 
-            <MudSelect Style="margin: 10px !important; width: 200px !important;" Placeholder="Status" Value="@taskItem.Status">
+            <MudSelect Style="margin: 10px !important; width: 200px !important;" Placeholder="Status" @bind-value="@taskItem.Status">
                 <MudSelectItem Value="@("To-do")">To-do</MudSelectItem>
                 <MudSelectItem Value="@("In progress")">In progress</MudSelectItem>
                 <MudSelectItem Value="@("Done")">Done</MudSelectItem>
